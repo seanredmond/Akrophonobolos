@@ -95,7 +95,7 @@ def _format_denomination(amt, denomination):
         plural = "s" if amt > 1 else ""
         return f"{whole}{frac} {D_STR[denomination]}{plural}"
 
-    return f"{amt} {D_STR[denomination]}{'s' if amt != 1 else ''}"
+    return f"{int(amt)} {D_STR[denomination]}{'s' if amt != 1 else ''}"
     
 
 
