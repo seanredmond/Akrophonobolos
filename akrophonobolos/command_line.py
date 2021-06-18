@@ -26,7 +26,7 @@ def main():
     for i in args.input:
         if detect_type(i) == INPUT_T.ACRO:
             p = obol.reduce_amount(obol.parse_greek_amount(i))
-            print(f"{i} = {p}")
+            print(f"{i} = {obol.format_amount(p)}")
 
 
 if __name__ == "__main__":

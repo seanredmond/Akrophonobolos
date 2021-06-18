@@ -1,6 +1,17 @@
+from enum import Enum, auto
 import re
 
 AMT = re.compile(r"((\d+)T)?((\d+)D)?((\d+(\.\d+)?)O)?")
+
+class DENOMINATION(Enum):
+    T = auto()
+    D = auto()
+    O = auto()
+
+D_STR = {DENOMINATION.T: "talent",
+         DENOMINATION.D: "drachma",
+         DENOMINATION.O: "obol"}
+
 
 NUMERALS = {"\U000003a4": (1,    0, 0.00), # Τ TAU (1 talent)
             "\U000003a7": (0, 1000, 0.00), # Χ KHI (1000 drachmas)
@@ -63,3 +74,30 @@ def parse_amount(amt):
 def parse_greek_amount(amt):
     """ Parse Unicode Greek acrophonic numeral. """
     return add_amounts(*[NUMERALS[c] for c in list(amt)])
+
+
+def format_amount(amt):
+    """ Format tuple for human-readability. """
+
+    return ", ".join(
+        [f for f
+         in [_format_denomination(*d) for d in zip(amt, list(DENOMINATION))]
+         if f is not None])
+
+
+def _format_denomination(amt, denomination):
+    if amt == 0:
+        return None
+
+    if amt % 1 in (0.5, 0.25):
+        frac = "½" if amt % 1 == 0.5 else "¼"
+        whole = int(amt // 1) if amt // 1 else ""
+        plural = "s" if amt > 1 else ""
+        return f"{whole}{frac} {D_STR[denomination]}{plural}"
+
+    return f"{amt} {D_STR[denomination]}{'s' if amt != 1 else ''}"
+    
+
+
+
+    

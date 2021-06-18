@@ -59,3 +59,12 @@ def test_add_with_reducing():
 
     assert obol.reduce_amount(
         obol.add_amounts(u, v, w, x, y, z)) == (11, 199, 1.0)
+
+
+def test_format_amount():
+    assert obol.format_amount((1, 1, 1)) == "1 talent, 1 drachma, 1 obol"
+    assert obol.format_amount((2, 2, 2)) == "2 talents, 2 drachmas, 2 obols"
+    assert obol.format_amount((2, 0, 2)) == "2 talents, 2 obols"
+    assert obol.format_amount((2, 2, 2.5)) == "2 talents, 2 drachmas, 2½ obols"
+    assert obol.format_amount((2, 2, 1.25)) == "2 talents, 2 drachmas, 1¼ obols"
+    assert obol.format_amount((2, 2, 0.25)) == "2 talents, 2 drachmas, ¼ obol"
