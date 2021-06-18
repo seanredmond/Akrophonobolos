@@ -12,6 +12,7 @@ def test_parse_amt():
 
 def test_parse_greek_amt():
     assert obol.parse_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁") == (1, 813, 1.5)
+    assert obol.parse_greek_amount("ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ") == (2, 1970, 0)
 
 
 def test_add_amounts():
