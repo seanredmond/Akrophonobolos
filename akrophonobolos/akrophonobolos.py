@@ -45,6 +45,15 @@ def add_amounts(*amts):
     return tuple([a + b for a, b in zip(amts[0], add_amounts(*amts[1:]))])
 
 
+def obolize(amt):
+    """ Convert currency about to all obols """
+    return (0, 0, (amt[0] * (6000 * 6)) + (amt[1] * 6) + amt[2])
+
+
+def subtract_amounts(left, right):
+    return reduce_amount((0, 0, obolize(left)[2] - obolize(right)[2]))
+
+
 def reduce_amount(amt):
     return _reduce_drachmas((_reduce_obols(amt)))
 

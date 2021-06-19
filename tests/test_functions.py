@@ -68,3 +68,9 @@ def test_format_amount():
     assert obol.format_amount((2, 2, 2.5)) == "2 talents, 2 drachmas, 2½ obols"
     assert obol.format_amount((2, 2, 1.25)) == "2 talents, 2 drachmas, 1¼ obols"
     assert obol.format_amount((2, 2, 0.25)) == "2 talents, 2 drachmas, ¼ obol"
+
+
+def test_subtract_amounts():
+    assert obol.subtract_amounts((5, 0, 0), (3, 0, 0)) == (2, 0, 0)
+    assert obol.subtract_amounts((5, 0, 0), (0, 3000, 0)) == (4, 3000, 0)
+    assert obol.subtract_amounts((5, 0, 0), (0, 0, 5)) == (4, 5999, 1)
