@@ -1,7 +1,7 @@
 from enum import Enum, auto
 import re
 
-AMT = re.compile(r"((\d+)T)?((\d+)D)?((\d+(\.\d+)?)O)?")
+AMT = re.compile(r"\A((\d+)T)?((\d+)D)?((\d+(\.\d+)?)O)?\Z")
 
 class DENOMINATION(Enum):
     T = auto()
@@ -68,6 +68,9 @@ def _reduce_obols(amt):
                        (0, int(amt[2] // 6), amt[2] % 6))
 
     
+def valid_amount_str(amt):
+    return AMT.search(amt) is not None
+
 
 def parse_amount(amt):
     """ Parse an Athenian currency string into a tuple. """
