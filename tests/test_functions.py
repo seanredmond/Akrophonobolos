@@ -80,3 +80,14 @@ def test_valid_amount_str():
     assert obol.valid_amount_str("1T")
     assert not obol.valid_amount_str("1Z")
     assert obol.valid_amount_str("261T5600D")
+
+
+def test_valid_amount_str():
+    assert obol.valid_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
+    assert not obol.valid_greek_amount("1Z")
+
+
+def test_format_greek():
+    assert obol.format_greek((20, 0, 0)) == "𐅉𐅉"
+    assert obol.format_greek((1, 813, 1.5)) == "Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁"
+    assert obol.format_greek((2, 1970, 0)) == "ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ"

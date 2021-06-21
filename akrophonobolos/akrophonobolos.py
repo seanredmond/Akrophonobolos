@@ -1,19 +1,21 @@
-from enum import Enum, auto
+from enum import Enum, IntEnum, auto
 import re
 
 AMT = re.compile(r"\A((\d+)T)?((\d+)D)?((\d+(\.\d+)?)O)?\Z")
+GREEK_AMT = re.compile(
+    r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
 
-class DENOMINATION(Enum):
-    T = auto()
-    D = auto()
-    O = auto()
+class DENOMINATION(IntEnum):
+    T = 0
+    D = 1
+    O = 2
 
 D_STR = {DENOMINATION.T: "talent",
          DENOMINATION.D: "drachma",
          DENOMINATION.O: "obol"}
 
 
-NUMERALS = {"\U0001014E": (5000, 0, 0.00)  # 𐅎 5000 TALENTS
+NUMERALS = {"\U0001014E": (5000, 0, 0.00),  # 𐅎 5000 TALENTS
             "\U0001014D": (1000, 0, 0.00), # 𐅍 1000 TALENTS
             "\U0001014C": (500,  0, 0.00), # 𐅌 500 TALENTS
             "\U0001014B": (100,  0, 0.00), # 𐅋 100 TALENTS
@@ -34,8 +36,9 @@ NUMERALS = {"\U0001014E": (5000, 0, 0.00)  # 𐅎 5000 TALENTS
             "\U00010140": (0,    0, 0.25), # 𐅀 ONE QUARTER
             }
 
-    # Not used:
-    # 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
+# Not used:
+# 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
+
 
 def add_amounts(*amts):
     """ Recursive memberwise addition of tuples. """
@@ -68,8 +71,8 @@ def _reduce_obols(amt):
                        (0, int(amt[2] // 6), amt[2] % 6))
 
     
-def valid_amount_str(amt):
-    return AMT.search(amt) is not None
+def valid_greek_amount(amt):
+    return GREEK_AMT.search(amt) is not None
 
 
 def parse_amount(amt):
@@ -97,6 +100,31 @@ def format_amount(amt):
          if f is not None])
 
 
+def _denomination_numerals(denomination):
+    return [(k, v) for k, v in NUMERALS.items() if v[denomination] > 0]
+
+
+def _format_greek_denomination(amt, denomination):
+    return "".join(_recurse_denomination(
+        amt, denomination, _denomination_numerals(denomination)))
+
+
+def _recurse_denomination(amt, denomination, nums):
+    if amt == 0:
+        return ()
+
+    d = [n for n in nums if n[1][denomination] <= amt][0]
+
+    return (d[0],) + \
+        _recurse_denomination(amt - d[1][denomination], denomination, nums)
+
+
+def format_greek(amt):
+    """ Format tuple as a Greek number. """
+    return "".join(
+        [_format_greek_denomination(*d) for d in zip(amt, DENOMINATION)])
+
+
 def _format_denomination(amt, denomination):
     if amt == 0:
         return None
@@ -108,7 +136,7 @@ def _format_denomination(amt, denomination):
         return f"{whole}{frac} {D_STR[denomination]}{plural}"
 
     return f"{int(amt)} {D_STR[denomination]}{'s' if amt != 1 else ''}"
-    
+
 
 
 
