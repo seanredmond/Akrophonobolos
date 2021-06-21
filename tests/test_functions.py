@@ -1,33 +1,54 @@
+import pytest
 import akrophonobolos as obol
 
 def test_parse_amt():
-    assert obol.parse_amount("1T") == (1, 0, 0)
-    assert obol.parse_amount("813D") == (0, 813, 0)
-    assert obol.parse_amount("1.5O") == (0, 0, 1.5)
-    assert obol.parse_amount("1T813D") == (1, 813, 0)
-    assert obol.parse_amount("1T1.5O") == (1, 0, 1.5)
-    assert obol.parse_amount("813D1.5O") == (0, 813, 1.5)
-    assert obol.parse_amount("1T813D1.5O") == (1, 813, 1.5)
+    assert obol.parse_amount("1T") == 144_000
+    assert obol.parse_amount("813D") == 19_512_000
+    assert obol.parse_amount("1.5O") == 6
+    assert obol.parse_amount("1T813D") == 19_656_000
+    assert obol.parse_amount("1T1.5O") == 144_006
+    assert obol.parse_amount("813D1.5O") == 19_512_006
+    assert obol.parse_amount("1T813D1.5O") == 19_656_006
+
+
+def test_parse_amt_obol_rounding():
+    assert obol.parse_amount("1O") == 4
+    assert obol.parse_amount("0.9O") == 4
+
+    assert obol.parse_amount("0.8O") == 3
+    assert obol.parse_amount("0.75O") == 3
+    assert obol.parse_amount("0.7O") == 3
+
+    assert obol.parse_amount("0.6O") == 2
+    assert obol.parse_amount("0.5O") == 2
+    assert obol.parse_amount("0.4O") == 2
+
+    assert obol.parse_amount("0.3O") == 1
+    assert obol.parse_amount("0.25O") == 1
+    assert obol.parse_amount("0.1O") == 0
+    assert obol.parse_amount("0.3O") == 1
 
 
 def test_parse_greek_amt():
-    assert obol.parse_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁") == (1, 813, 1.5)
-    assert obol.parse_greek_amount("ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ") == (2, 1970, 0)
+    assert obol.parse_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁") == 163_518
+    assert obol.parse_greek_amount("ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ") == 335_280
 
 
-def test_add_amounts():
-    assert obol.add_amounts((1, 0, 0), (1, 0, 0)) == (2, 0, 0)
-    assert obol.add_amounts((1, 0, 0), (0, 1, 0)) == (1, 1, 0)
-    assert obol.add_amounts((1, 0, 0), (0, 0, 1)) == (1, 0, 1)
-    assert obol.add_amounts((1, 1, 0), (1, 0, 0)) == (2, 1, 0)
-    assert obol.add_amounts((1, 0, 0), (1, 1, 0)) == (2, 1, 0)
-    assert obol.add_amounts((1, 1, 0), (1, 1, 0)) == (2, 2, 0)
-    assert obol.add_amounts((1, 1, 1), (1, 1, 0)) == (2, 2, 1)
-    assert obol.add_amounts((1, 1, 0), (1, 1, 1)) == (2, 2, 1)
-    assert obol.add_amounts((1, 1, 1), (1, 1, 1)) == (2, 2, 2)
+@pytest.mark.skip(reason="Not sure if this is needed")
+def test_sum_amounts():
+    assert obol.sum_amounts((1, 0, 0), (1, 0, 0)) == (2, 0, 0)
+    assert obol.sum_amounts((1, 0, 0), (0, 1, 0)) == (1, 1, 0)
+    assert obol.sum_amounts((1, 0, 0), (0, 0, 1)) == (1, 0, 1)
+    assert obol.sum_amounts((1, 1, 0), (1, 0, 0)) == (2, 1, 0)
+    assert obol.sum_amounts((1, 0, 0), (1, 1, 0)) == (2, 1, 0)
+    assert obol.sum_amounts((1, 1, 0), (1, 1, 0)) == (2, 2, 0)
+    assert obol.sum_amounts((1, 1, 1), (1, 1, 0)) == (2, 2, 1)
+    assert obol.sum_amounts((1, 1, 0), (1, 1, 1)) == (2, 2, 1)
+    assert obol.sum_amounts((1, 1, 1), (1, 1, 1)) == (2, 2, 2)
     
-    assert obol.add_amounts(*(((1, 0, 0),) * 5)) == (5, 0, 0)
-    assert obol.add_amounts(*(((1, 1, 1),) * 5)) == (5, 5, 5)
+    assert obol.sum_amounts(*(((1, 0, 0),) * 5)) == (5, 0, 0)
+    assert obol.sum_amounts(*(((1, 1, 1),) * 5)) == (5, 5, 5)
+
 
 def test_reduce_amounts():
     assert obol.reduce_amount((0, 0, 7)) == (0, 1, 1)
@@ -38,6 +59,7 @@ def test_reduce_amounts():
     assert obol.reduce_amount((0, 0, 36000)) == (1, 0, 0)
 
 
+@pytest.mark.skip(reason="Not sure if this is needed")
 def test_add_with_reducing():
     a = obol.parse_amount("20T")
     b = obol.parse_amount("50T")
@@ -47,7 +69,7 @@ def test_add_with_reducing():
     f = obol.parse_amount("18T3000D")
 
     assert obol.reduce_amount(
-        obol.add_amounts(a, b, c, d, e, f)) == (261, 5610, 3.5)
+        obol.sum_amounts(a, b, c, d, e, f)) == (261, 5610, 3.5)
 
 
     u = obol.parse_amount("5696D")
@@ -58,16 +80,22 @@ def test_add_with_reducing():
     z = obol.parse_amount("4173D4O")
 
     assert obol.reduce_amount(
-        obol.add_amounts(u, v, w, x, y, z)) == (11, 199, 1.0)
+        obol.sum_amounts(u, v, w, x, y, z)) == (11, 199, 1.0)
 
 
-def test_format_amount():
-    assert obol.format_amount((1, 1, 1)) == "1 talent, 1 drachma, 1 obol"
-    assert obol.format_amount((2, 2, 2)) == "2 talents, 2 drachmas, 2 obols"
-    assert obol.format_amount((2, 0, 2)) == "2 talents, 2 obols"
-    assert obol.format_amount((2, 2, 2.5)) == "2 talents, 2 drachmas, 2½ obols"
-    assert obol.format_amount((2, 2, 1.25)) == "2 talents, 2 drachmas, 1¼ obols"
-    assert obol.format_amount((2, 2, 0.25)) == "2 talents, 2 drachmas, ¼ obol"
+def test_format_amount_english():
+    assert obol.format_amount(144_028, obol.Fmt.ENGLISH) == \
+        "1 talent, 1 drachma, 1 obol"
+    assert obol.format_amount(288_056, obol.Fmt.ENGLISH) == \
+        "2 talents, 2 drachmas, 2 obols"
+    assert obol.format_amount(288_008, obol.Fmt.ENGLISH) == \
+        "2 talents, 2 obols"
+    assert obol.format_amount(288_058, obol.Fmt.ENGLISH) == \
+        "2 talents, 2 drachmas, 2½ obols"
+    assert obol.format_amount(288_053, obol.Fmt.ENGLISH) == \
+        "2 talents, 2 drachmas, 1¼ obols"
+    assert obol.format_amount(288_049, obol.Fmt.ENGLISH) == \
+        "2 talents, 2 drachmas, ¼ obol"
 
 
 def test_subtract_amounts():
@@ -85,9 +113,3 @@ def test_valid_amount_str():
 def test_valid_amount_str():
     assert obol.valid_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
     assert not obol.valid_greek_amount("1Z")
-
-
-def test_format_greek():
-    assert obol.format_greek((20, 0, 0)) == "𐅉𐅉"
-    assert obol.format_greek((1, 813, 1.5)) == "Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁"
-    assert obol.format_greek((2, 1970, 0)) == "ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ"
