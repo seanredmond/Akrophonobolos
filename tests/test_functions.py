@@ -83,6 +83,19 @@ def test_add_with_reducing():
         obol.sum_amounts(u, v, w, x, y, z)) == (11, 199, 1.0)
 
 
+def test_format_amount_abbreviation():
+    assert obol.format_amount(144_028) == "1T1D1O"
+    assert obol.format_amount(288_056) == "2T2D2O"
+    assert obol.format_amount(288_008) == "2T2O"
+    assert obol.format_amount(288_058) == "2T2D2½O"
+    assert obol.format_amount(288_053) == "2T2D1¼O"
+    assert obol.format_amount(288_049) == "2T2D¼O"
+
+    # Abbreviation is the default
+    assert obol.format_amount(144_028, obol.Fmt.ABBR) == \
+        obol.format_amount(144_028)
+    
+
 def test_format_amount_english():
     assert obol.format_amount(144_028, obol.Fmt.ENGLISH) == \
         "1 talent, 1 drachma, 1 obol"

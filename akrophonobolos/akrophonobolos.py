@@ -135,7 +135,10 @@ def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
                         " ", ", ")
 
 
-    return _fmt_abbreviated(rec_reduce(amt, FMT_TDO), fmt_flags)
+    return _fmt_tdo(rec_reduce(amt, FMT_TDO),
+                            (("T", "T"), ("D", "D"), ("O", "O")),
+                            _fmt_functions(fmt_flags),
+                            "", "")
 
 
 def _fmt_fraction(amt):
