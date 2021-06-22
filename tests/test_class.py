@@ -96,6 +96,10 @@ def test_div():
     assert int(money) == 120_000
     assert money.as_abbr() == "5000d"
 
+    # an Akro divided by an Akro should return a float
+    assert money/money == 1
+    assert isinstance(money/money, float)
+
 
 def test_interest():
     # Interest amounts from the beginning of IG I³ 369. Simple

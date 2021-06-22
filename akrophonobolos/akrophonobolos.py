@@ -108,6 +108,12 @@ class Akro():
         return self.__floordiv__(other)
 
     def __floordiv__(self, other):
+        # The units cancel out when an Akro id divided by an Akro, so
+        # return a float
+        if isinstance(other, Akro):
+            return float(Akro(self.qo // float(other)))
+
+        # otherwise treat the divisor as a float and return an Akro
         return Akro(self.qo // float(other))
 
 
