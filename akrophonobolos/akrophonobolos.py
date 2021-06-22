@@ -45,9 +45,75 @@ FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 # # 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
 
 
-def _qo(amt):
+class Akro():
+    def __init__(self, amt):
+        self.qo = self._parse_amt(amt)
+
+    def _parse_amt(self, amt):
+        if isinstance(amt, (int, float)):
+            return round(amt)
+
+        if valid_greek_amount(amt):
+            return parse_greek_amount(amt)
+
+        if valid_amount_str(amt):
+            return parse_amount(amt)
+
+        raise Exception("UNHANDLED")
+
+    def as_abbr(self, decimal=False):
+        if decimal:
+            return format_amount(self.qo, Fmt.ABBR | Fmt.DECIMAL)
+
+        return format_amount(self.qo, Fmt.ABBR)
+
+    def as_greek(self):
+        return format_amount(self.qo, Fmt.GREEK)
+
+    def as_phrase(self, decimal=False):
+        if decimal:
+            return format_amount(self.qo, Fmt.ENGLISH | Fmt.DECIMAL)
+
+        return format_amount(self.qo, Fmt.ENGLISH | Fmt.FRACTION)
+
+    def __str__(self):
+        return format_amount(self.qo, Fmt.ABBR | Fmt.FRACTION)
+
+    def __repr__(self):
+        return (f"{self.__class__.__name__} ("
+                f"{self.__str__()} [= {self.qo} ¼-obols])")
+
+    def __int__(self):
+        return self.qo
+
+    def __eq__(self, other):
+        return self.qo == int(other)
+
+    def __ne__(self, other):
+        return self.qo != int(other)
+
+    def __float__(self):
+        return float(self.qo)
+
+    def __add__(self, other):
+        return Akro(self.qo + float(other))
+
+    def __sub__(self, other):
+        return Akro(self.qo - float(other))
+
+    def __mul__(self, other):
+        return Akro(self.qo * float(other))
+
+    def __truediv__(self, other):
+        return self.__floordiv__(other)
+
+    def __floordiv__(self, other):
+        return Akro(self.qo // float(other))
+
+
+def _qo(*amt):
     """ Convert tuple amount to quarter obols. """
-    return amt[0] * 144_000 + amt[1] * 24_000 + round(amt[2] * 4)
+    return amt[0] * 144_000 + amt[1] * 24 + round(amt[2] * 4)
 
 
 def rec_reduce(amt, denominations):
@@ -74,7 +140,7 @@ def parse_amount(amt):
     drachmas = 0 if amt_match[4] is None else int(amt_match[4])
     obols = 0 if amt_match[6] is None else float(amt_match[6])
 
-    return _qo((talents, drachmas, obols))
+    return _qo(talents, drachmas, obols)
 
 
 def parse_greek_amount(amt):
