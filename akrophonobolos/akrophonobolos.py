@@ -142,6 +142,7 @@ def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
 
 
 def _fmt_fraction(amt):
+    """ Format fractional obols as fractions. """
     if amt % 1 in (0.5, 0.25):
         frac = "½" if amt % 1 == 0.5 else "¼"
         whole = int(amt // 1) if amt // 1 else ""
@@ -150,8 +151,18 @@ def _fmt_fraction(amt):
     return int(amt)
 
 
+def _fmt_decimal(amt):
+    """ Format fractional obols as decimals. """
+    if amt % 1:
+        return float(amt)
+
+    return int(amt)
+
 
 def _fmt_functions(fmt_flags):
+    """ Return a tuple of functions to be used to format TDO. """
+    if fmt_flags & Fmt.DECIMAL:
+        return (int, int, _fmt_decimal)
     return (int, int, _fmt_fraction)
 
 

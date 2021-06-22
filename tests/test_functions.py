@@ -94,7 +94,16 @@ def test_format_amount_abbreviation():
     # Abbreviation is the default
     assert obol.format_amount(144_028, obol.Fmt.ABBR) == \
         obol.format_amount(144_028)
-    
+
+
+def test_format_amount_abbreviation_decimal():
+    assert obol.format_amount(144_028, obol.Fmt.DECIMAL) == "1T1D1O"
+    assert obol.format_amount(288_056, obol.Fmt.DECIMAL) == "2T2D2O"
+    assert obol.format_amount(288_008, obol.Fmt.DECIMAL) == "2T2O"
+    assert obol.format_amount(288_058, obol.Fmt.DECIMAL) == "2T2D2.5O"
+    assert obol.format_amount(288_053, obol.Fmt.DECIMAL) == "2T2D1.25O"
+    assert obol.format_amount(288_049, obol.Fmt.DECIMAL) == "2T2D0.25O"
+
 
 def test_format_amount_english():
     assert obol.format_amount(144_028, obol.Fmt.ENGLISH) == \
@@ -110,6 +119,21 @@ def test_format_amount_english():
     assert obol.format_amount(288_049, obol.Fmt.ENGLISH) == \
         "2 talents, 2 drachmas, ¼ obol"
 
+
+def test_format_amount_english_decimal():
+    assert obol.format_amount(144_028, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+        "1 talent, 1 drachma, 1 obol"
+    assert obol.format_amount(288_056, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+        "2 talents, 2 drachmas, 2 obols"
+    assert obol.format_amount(288_008, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+        "2 talents, 2 obols"
+    assert obol.format_amount(288_058, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+        "2 talents, 2 drachmas, 2.5 obols"
+    assert obol.format_amount(288_053, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+        "2 talents, 2 drachmas, 1.25 obols"
+    assert obol.format_amount(288_049, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+        "2 talents, 2 drachmas, 0.25 obol"
+    
 
 def test_subtract_amounts():
     assert obol.subtract_amounts((5, 0, 0), (3, 0, 0)) == (2, 0, 0)
