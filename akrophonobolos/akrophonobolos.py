@@ -114,10 +114,6 @@ def parse_amount(amt):
 
 def parse_greek_amount(amt):
     """ Parse Unicode Greek acrophonic numeral. """
-    #return _qo(sum_amounts(*[NUMERALS[c] for c in list(amt)]))
-    print(list(amt))
-    print([NUMERALS[c] for c in list(amt)])
-    print(sum([NUMERALS[c] for c in list(amt)]))
     return sum([NUMERALS[c] for c in list(amt)])
 
 
@@ -136,9 +132,9 @@ def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
 
 
     return _fmt_tdo(rec_reduce(amt, FMT_TDO),
-                            (("T", "T"), ("D", "D"), ("O", "O")),
+                            (("t", "t"), ("d", "d"), ("b", "b")),
                             _fmt_functions(fmt_flags),
-                            "", "")
+                            "", " ")
 
 
 def _fmt_akrophonic(amt):

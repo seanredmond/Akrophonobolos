@@ -84,12 +84,12 @@ def test_add_with_reducing():
 
 
 def test_format_amount_abbreviation():
-    assert obol.format_amount(144_028) == "1T1D1O"
-    assert obol.format_amount(288_056) == "2T2D2O"
-    assert obol.format_amount(288_008) == "2T2O"
-    assert obol.format_amount(288_058) == "2T2D2½O"
-    assert obol.format_amount(288_053) == "2T2D1¼O"
-    assert obol.format_amount(288_049) == "2T2D¼O"
+    assert obol.format_amount(144_028) == "1t 1d 1b"
+    assert obol.format_amount(288_056) == "2t 2d 2b"
+    assert obol.format_amount(288_008) == "2t 2b"
+    assert obol.format_amount(288_058) == "2t 2d 2½b"
+    assert obol.format_amount(288_053) == "2t 2d 1¼b"
+    assert obol.format_amount(288_049) == "2t 2d ¼b"
 
     # Abbreviation is the default
     assert obol.format_amount(144_028, obol.Fmt.ABBR) == \
@@ -97,12 +97,12 @@ def test_format_amount_abbreviation():
 
 
 def test_format_amount_abbreviation_decimal():
-    assert obol.format_amount(144_028, obol.Fmt.DECIMAL) == "1T1D1O"
-    assert obol.format_amount(288_056, obol.Fmt.DECIMAL) == "2T2D2O"
-    assert obol.format_amount(288_008, obol.Fmt.DECIMAL) == "2T2O"
-    assert obol.format_amount(288_058, obol.Fmt.DECIMAL) == "2T2D2.5O"
-    assert obol.format_amount(288_053, obol.Fmt.DECIMAL) == "2T2D1.25O"
-    assert obol.format_amount(288_049, obol.Fmt.DECIMAL) == "2T2D0.25O"
+    assert obol.format_amount(144_028, obol.Fmt.DECIMAL) == "1t 1d 1b"
+    assert obol.format_amount(288_056, obol.Fmt.DECIMAL) == "2t 2d 2b"
+    assert obol.format_amount(288_008, obol.Fmt.DECIMAL) == "2t 2b"
+    assert obol.format_amount(288_058, obol.Fmt.DECIMAL) == "2t 2d 2.5b"
+    assert obol.format_amount(288_053, obol.Fmt.DECIMAL) == "2t 2d 1.25b"
+    assert obol.format_amount(288_049, obol.Fmt.DECIMAL) == "2t 2d 0.25b"
 
 
 def test_format_greek():
