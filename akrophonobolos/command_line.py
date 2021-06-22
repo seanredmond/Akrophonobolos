@@ -18,7 +18,10 @@ def detect_type(input):
     if any([i in obol.NUMERALS.keys() for i in input]):
         return INPUT_T.ACRO
 
-    if input in ("+", "i"):
+    if obol.valid_amount_str(input):
+        return INPUT_T.STR
+
+    if input in ("+","-"):
         return INPUT_T.OP
 
     return INPUT_T.UNK
@@ -36,12 +39,13 @@ def recurse_calc(eq):
 
     if len(eq) > 1:
         if eq[1] == "+":
-            return obol.reduce_amount(
-                obol.add_amounts(parse_input_amount(eq[0]),
-                                 recurse_calc(eq[2:])))
-        raise Exception("SUBSTRACTION NOT HANDLED")
+            return parse_input_amount(eq[0]) + recurse_calc(eq[2:])
 
-    raise UnexpectedEndofEquation()
+        if eq[1] == "-":
+            return parse_input_amount(eq[0]) - recurse_calc(eq[2:])
+        raise Exception("UNEXPECTED INPUT")
+
+    raise UnexpectedEndOfEquation()
 
 
 def do_equation(input):
@@ -51,7 +55,10 @@ def do_equation(input):
 
 def parse_input_amount(input):
     if detect_type(input) == INPUT_T.ACRO:
-        return obol.reduce_amount(obol.parse_greek_amount(input))
+        return obol.parse_greek_amount(input)
+
+    if detect_type(input) == INPUT_T.STR:
+        return obol.parse_amount(input)
 
     raise Exception("UNHANDLED")
 
@@ -59,18 +66,23 @@ def parse_input_amount(input):
 def main():
     parser = argparse.ArgumentParser(
         description="Ancient Athenian acrophonic numeral converter"
-        )
+    )
     parser.add_argument("input", nargs="+", type=str)
     args = parser.parse_args()
-
+    
     if is_equation(args.input):
         do_equation(args.input)
         exit()
-
+        
     for i in args.input:
         if detect_type(i) == INPUT_T.ACRO:
-            p = obol.reduce_amount(obol.parse_greek_amount(i))
+            p = obol.parse_greek_amount(i)
+            #p = obol.reduce_amount(obol.parse_greek_amount(i))
             print(f"{i} = {obol.format_amount(p)}")
+
+
+                                  
+                                  
 
 
 if __name__ == "__main__":

@@ -101,6 +101,10 @@ def valid_greek_amount(amt):
     return GREEK_AMT.search(amt) is not None
 
 
+def valid_amount_str(amt):
+    return AMT.search(amt) is not None
+
+
 def parse_amount(amt):
     """ Parse an Athenian currency string into a tuple. """
 
