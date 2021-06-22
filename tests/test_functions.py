@@ -105,6 +105,11 @@ def test_format_amount_abbreviation_decimal():
     assert obol.format_amount(288_049, obol.Fmt.DECIMAL) == "2T2D0.25O"
 
 
+def test_format_greek():
+    assert obol.format_amount(163_518, obol.Fmt.GREEK) == "Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁"
+    assert obol.format_amount(335_280, obol.Fmt.GREEK) == "ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ"
+
+
 def test_format_amount_english():
     assert obol.format_amount(144_028, obol.Fmt.ENGLISH) == \
         "1 talent, 1 drachma, 1 obol"

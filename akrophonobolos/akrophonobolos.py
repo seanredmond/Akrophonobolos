@@ -123,9 +123,9 @@ def parse_greek_amount(amt):
 
 def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
     """ Format ¼-obols for readability """
-    print(fmt_flags)
-
-    print(rec_reduce(amt, (144_000, 24)))
+    if fmt_flags & Fmt.GREEK:
+        return "".join(_fmt_akrophonic(amt))
+    
 
     if fmt_flags & Fmt.ENGLISH:
         return _fmt_tdo(rec_reduce(amt, FMT_TDO),
@@ -140,6 +140,19 @@ def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
                             _fmt_functions(fmt_flags),
                             "", "")
 
+
+def _fmt_akrophonic(amt):
+    if amt < 1:
+        return []
+
+    print(amt)
+
+    num = [k for k, v in NUMERALS.items() if v <= amt][0]
+
+    print(num)
+
+    return [num] + _fmt_akrophonic(amt - NUMERALS[num])
+    
 
 def _fmt_fraction(amt):
     """ Format fractional obols as fractions. """
