@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import akrophonobolos as obol
 import argparse
 from enum import Enum, auto
@@ -6,6 +7,9 @@ from sys import exit
 
 
 class UnexpectedEndOfEquation(Exception):
+    pass
+
+class UnexpectedInput(Exception):
     pass
 
 
@@ -35,34 +39,23 @@ def is_equation(input):
 
 def recurse_calc(eq):
     if len(eq) == 1:
-        return parse_input_amount(eq[0])
-
-        raise Exception("NON GREEK NOT UNHANDLED")
+        return obol.Akro(eq[0])
 
     if len(eq) > 1:
         if eq[1] == "+":
-            return parse_input_amount(eq[0]) + recurse_calc(eq[2:])
+            return obol.Akro(eq[0]) + recurse_calc(eq[2:])
 
         if eq[1] == "-":
-            return parse_input_amount(eq[0]) - recurse_calc(eq[2:])
-        raise Exception("UNEXPECTED INPUT")
+            return obol.Akro(eq[0]) - recurse_calc(eq[2:])
+
+        raise UnexpectedInput(f"Expected '+' or '-', got '{eq[1]}'")
 
     raise UnexpectedEndOfEquation()
 
 
 def do_equation(input):
     result = recurse_calc(input)
-    print(obol.format_amount(result))
-
-
-def parse_input_amount(input):
-    if detect_type(input) == INPUT_T.ACRO:
-        return obol.parse_greek_amount(input)
-
-    if detect_type(input) == INPUT_T.STR:
-        return obol.parse_amount(input)
-
-    raise Exception("UNHANDLED")
+    print(f"{result.as_greek()} = {result.as_abbr()}")
 
 
 def main():
@@ -77,9 +70,14 @@ def main():
         exit()
 
     for i in args.input:
-        if detect_type(i) == INPUT_T.ACRO:
-            p = obol.parse_greek_amount(i)
-            print(f"{i} = {obol.format_amount(p)}")
+        if detect_type(i) in (INPUT_T.ACRO, INPUT_T.STR):
+            p = obol.Akro(i)
+
+            if detect_type(i) == INPUT_T.ACRO:
+                print(f"{i} = {p.as_phrase()}")
+
+            else:
+                print(f"{i} = {p.as_greek()}")
 
 
 if __name__ == "__main__":
