@@ -1,7 +1,7 @@
 from enum import Enum, IntEnum, IntFlag, auto
 import re
 
-AMT = re.compile(r"\A((\d+)T)?((\d+)D)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
+AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
     r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
 
