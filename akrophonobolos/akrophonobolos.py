@@ -1,14 +1,14 @@
-from enum import Enum, IntEnum, IntFlag, auto
+from enum import IntFlag #Enum, IntEnum, , auto
 import re
 
 AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
     r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
 
-class DENOMINATION(IntEnum):
-    T = 0
-    D = 1
-    O = 2
+# class DENOMINATION(IntEnum):
+#     T = 0
+#     D = 1
+#     O = 2
 
 
 class Fmt(IntFlag):
@@ -19,9 +19,9 @@ class Fmt(IntFlag):
     FRACTION = 1
 
 
-D_STR = {DENOMINATION.T: "talent",
-         DENOMINATION.D: "drachma",
-         DENOMINATION.O: "obol"}
+# D_STR = {DENOMINATION.T: "talent",
+#          DENOMINATION.D: "drachma",
+#          DENOMINATION.O: "obol"}
 
 # Amounts are stored internally in ¼-obols.
 # 1 talent = 144,000 ¼-obols
@@ -50,43 +50,12 @@ NUMERALS = {"\U0001014E": 720_000_000, # 𐅎 5000 TALENTS
 
 FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 
-# Not used:
-# 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
-
-
-def sum_amounts(*amts):
-    """ Recursive memberwise addition of tuples. """
-    if len(amts) == 0:
-        return (0, 0, 0)
-
-    return tuple([a + b for a, b in zip(amts[0], sum_amounts(*amts[1:]))])
+# # Not used:
+# # 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
 
 def _qo(amt):
     """ Convert tuple amount to quarter obols. """
     return amt[0] * 144_000 + amt[1] * 24_000 + round(amt[2] * 4)
-
-
-def obolize(amt):
-    """ Convert currency about to all obols """
-    return (0, 0, (amt[0] * (6000 * 6)) + (amt[1] * 6) + amt[2])
-
-
-def subtract_amounts(left, right):
-    return reduce_amount((0, 0, obolize(left)[2] - obolize(right)[2]))
-
-
-def reduce_amount(amt):
-    return _reduce_drachmas((_reduce_obols(amt)))
-
-
-def _reduce_drachmas(amt):
-    return sum_amounts((amt[0], 0, amt[2]),
-                       (amt[1] // 6000, amt[1] % 6000, 0))
-
-
-def _reduce_obols(amt):
-    return sum_amounts((amt[0], amt[1], 0),
-                       (0, int(amt[2] // 6), amt[2] % 6))
 
 
 def rec_reduce(amt, denominations):
@@ -145,11 +114,7 @@ def _fmt_akrophonic(amt):
     if amt < 1:
         return []
 
-    print(amt)
-
     num = [k for k, v in NUMERALS.items() if v <= amt][0]
-
-    print(num)
 
     return [num] + _fmt_akrophonic(amt - NUMERALS[num])
     
@@ -190,45 +155,3 @@ def _fmt_tdo(tdo, denominations, fmt_funcs, delim1, delim2):
     return delim2.join(
         [f"{func(amt)}{delim1}{_fmt_plural(amt, d)}"
          for amt, d, func in zip(tdo, denominations, fmt_funcs) if amt])
-
-
-def _fmt_abbreviated(tdo, fmt_flags):
-    return "".join(
-        [f"{x[0]}{x[1]}" for x in zip(tdo, ("T", "D", "O")) if x[0]])
-
-
-def _denomination_numerals(denomination):
-    return [(k, v) for k, v in NUMERALS.items() if v[denomination] > 0]
-
-
-def _format_greek_denomination(amt, denomination):
-    return "".join(_recurse_denomination(
-        amt, denomination, _denomination_numerals(denomination)))
-
-
-def _recurse_denomination(amt, denomination, nums):
-    if amt == 0:
-        return ()
-
-    d = [n for n in nums if n[1][denomination] <= amt][0]
-
-    return (d[0],) + \
-        _recurse_denomination(amt - d[1][denomination], denomination, nums)
-
-
-def _format_denomination(amt, denomination):
-    if amt == 0:
-        return None
-
-    if amt % 1 in (0.5, 0.25):
-        frac = "½" if amt % 1 == 0.5 else "¼"
-        whole = int(amt // 1) if amt // 1 else ""
-        plural = "s" if amt > 1 else ""
-        return f"{whole}{frac} {D_STR[denomination]}{plural}"
-
-    return f"{int(amt)} {D_STR[denomination]}{'s' if amt != 1 else ''}"
-
-
-
-
-    
