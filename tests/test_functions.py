@@ -3,9 +3,13 @@ import akrophonobolos as obol
 
 def test_parse_amt():
     assert obol.parse_amount("1T") == 144_000
+    assert obol.parse_amount("1t") == 144_000
     assert obol.parse_amount("813D") == 19_512_000
+    assert obol.parse_amount("813d") == 19_512_000
     assert obol.parse_amount("1.5O") == 6
-    assert obol.parse_amount("1T813D") == 19_656_000
+    assert obol.parse_amount("1.5o") == 6
+    assert obol.parse_amount("1t813d") == 19_656_000
+    assert obol.parse_amount("1t813d") == 19_656_000
     assert obol.parse_amount("1T1.5O") == 144_006
     assert obol.parse_amount("813D1.5O") == 19_512_006
     assert obol.parse_amount("1T813D1.5O") == 19_656_006
