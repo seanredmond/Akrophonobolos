@@ -1,5 +1,5 @@
-import pytest
 import akrophonobolos as obol
+
 
 def test_parse_amt():
     assert obol.parse_amount("1T") == 144_000
@@ -84,19 +84,25 @@ def test_format_amount_english():
 
 
 def test_format_amount_english_decimal():
-    assert obol.format_amount(144_028, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+    assert obol.format_amount(
+        144_028, obol.Fmt.ENGLISH | obol.Fmt.DECIMAL) == \
         "1 talent, 1 drachma, 1 obol"
-    assert obol.format_amount(288_056, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+    assert obol.format_amount(
+        288_056, obol.Fmt.ENGLISH | obol.Fmt.DECIMAL) == \
         "2 talents, 2 drachmas, 2 obols"
-    assert obol.format_amount(288_008, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+    assert obol.format_amount(
+        288_008, obol.Fmt.ENGLISH | obol.Fmt.DECIMAL) == \
         "2 talents, 2 obols"
-    assert obol.format_amount(288_058, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+    assert obol.format_amount(
+        288_058, obol.Fmt.ENGLISH | obol.Fmt.DECIMAL) == \
         "2 talents, 2 drachmas, 2.5 obols"
-    assert obol.format_amount(288_053, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+    assert obol.format_amount(
+        288_053, obol.Fmt.ENGLISH | obol.Fmt.DECIMAL) == \
         "2 talents, 2 drachmas, 1.25 obols"
-    assert obol.format_amount(288_049, obol.Fmt.ENGLISH|obol.Fmt.DECIMAL) == \
+    assert obol.format_amount(
+        288_049, obol.Fmt.ENGLISH | obol.Fmt.DECIMAL) == \
         "2 talents, 2 drachmas, 0.25 obol"
-    
+
 
 def test_valid_amount_str():
     assert obol.valid_amount_str("1T")

@@ -4,8 +4,10 @@ import argparse
 from enum import Enum, auto
 from sys import exit
 
+
 class UnexpectedEndOfEquation(Exception):
     pass
+
 
 class INPUT_T(Enum):
     ACRO = auto()
@@ -21,7 +23,7 @@ def detect_type(input):
     if obol.valid_amount_str(input):
         return INPUT_T.STR
 
-    if input in ("+","-"):
+    if input in ("+", "-"):
         return INPUT_T.OP
 
     return INPUT_T.UNK
@@ -69,20 +71,15 @@ def main():
     )
     parser.add_argument("input", nargs="+", type=str)
     args = parser.parse_args()
-    
+
     if is_equation(args.input):
         do_equation(args.input)
         exit()
-        
+
     for i in args.input:
         if detect_type(i) == INPUT_T.ACRO:
             p = obol.parse_greek_amount(i)
-            #p = obol.reduce_amount(obol.parse_greek_amount(i))
             print(f"{i} = {obol.format_amount(p)}")
-
-
-                                  
-                                  
 
 
 if __name__ == "__main__":

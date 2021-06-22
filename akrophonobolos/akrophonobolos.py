@@ -1,14 +1,9 @@
-from enum import IntFlag #Enum, IntEnum, , auto
+from enum import IntFlag
 import re
 
 AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
     r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
-
-# class DENOMINATION(IntEnum):
-#     T = 0
-#     D = 1
-#     O = 2
 
 
 class Fmt(IntFlag):
@@ -19,39 +14,36 @@ class Fmt(IntFlag):
     FRACTION = 1
 
 
-# D_STR = {DENOMINATION.T: "talent",
-#          DENOMINATION.D: "drachma",
-#          DENOMINATION.O: "obol"}
-
 # Amounts are stored internally in ¼-obols.
 # 1 talent = 144,000 ¼-obols
 # 1 drachma = 24 ¼-obols
 
-NUMERALS = {"\U0001014E": 720_000_000, # 𐅎 5000 TALENTS
-            "\U0001014D": 144_000_000, # 𐅍 1000 TALENTS
-            "\U0001014C":  72_000_000, # 𐅌 500 TALENTS
-            "\U0001014B":  14_400_000, # 𐅋 100 TALENTS
-            "\U0001014A":   7_200_000, # 𐅊 FIFTY TALENTS
-            "\U00010149":   1_440_000, # 𐅉 TEN TALENTS
-            "\U00010148":     720_000, # 𐅈 FIVE TALENTS
-            "\U000003a4":     144_000, # Τ TAU (1 talent)
-            "\U00010146":     120_000, # 𐅆 FIVE THOUSAND
-            "\U000003a7":      24_000, # Χ KHI (1000 drachmas)
-            "\U00010145":      12_000, # 𐅅 FIVE HUNDRED
-            "\U00000397":       2_400, # Η ETA (100 drachmas)
-            "\U00010144":       1_200, # 𐅄 FIFTY
-            "\U00000394":         240, # Δ DELTA (10 drachmas)
-            "\U00010143":         120, # 𐅃 FIVE
-            "\U00010142":          24, # 𐅂 ONE DRACHMA
-            "\U00000399":           4, # Ι IOTA (1 obol)
-            "\U00010141":           2, # 𐅁 ONE HALF
-            "\U00010140":           1, # 𐅀 ONE QUARTER
+NUMERALS = {"\U0001014E": 720_000_000,  # 𐅎 5000 TALENTS
+            "\U0001014D": 144_000_000,  # 𐅍 1000 TALENTS
+            "\U0001014C":  72_000_000,  # 𐅌 500 TALENTS
+            "\U0001014B":  14_400_000,  # 𐅋 100 TALENTS
+            "\U0001014A":   7_200_000,  # 𐅊 FIFTY TALENTS
+            "\U00010149":   1_440_000,  # 𐅉 TEN TALENTS
+            "\U00010148":     720_000,  # 𐅈 FIVE TALENTS
+            "\U000003a4":     144_000,  # Τ TAU (1 talent)
+            "\U00010146":     120_000,  # 𐅆 FIVE THOUSAND
+            "\U000003a7":      24_000,  # Χ KHI (1000 drachmas)
+            "\U00010145":      12_000,  # 𐅅 FIVE HUNDRED
+            "\U00000397":       2_400,  # Η ETA (100 drachmas)
+            "\U00010144":       1_200,  # 𐅄 FIFTY
+            "\U00000394":         240,  # Δ DELTA (10 drachmas)
+            "\U00010143":         120,  # 𐅃 FIVE
+            "\U00010142":          24,  # 𐅂 ONE DRACHMA
+            "\U00000399":           4,  # Ι IOTA (1 obol)
+            "\U00010141":           2,  # 𐅁 ONE HALF
+            "\U00010140":           1,  # 𐅀 ONE QUARTER
             }
 
 FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 
 # # Not used:
 # # 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
+
 
 def _qo(amt):
     """ Convert tuple amount to quarter obols. """
@@ -64,8 +56,8 @@ def rec_reduce(amt, denominations):
             rec_reduce(amt % denominations[0], denominations[1:])
 
     return (amt/4,)
-                       
-    
+
+
 def valid_greek_amount(amt):
     return GREEK_AMT.search(amt) is not None
 
@@ -90,11 +82,10 @@ def parse_greek_amount(amt):
     return sum([NUMERALS[c] for c in list(amt)])
 
 
-def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
+def format_amount(amt, fmt_flags=Fmt.ABBR | Fmt.FRACTION):
     """ Format ¼-obols for readability """
     if fmt_flags & Fmt.GREEK:
         return "".join(_fmt_akrophonic(amt))
-    
 
     if fmt_flags & Fmt.ENGLISH:
         return _fmt_tdo(rec_reduce(amt, FMT_TDO),
@@ -103,11 +94,10 @@ def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
                         _fmt_functions(fmt_flags),
                         " ", ", ")
 
-
     return _fmt_tdo(rec_reduce(amt, FMT_TDO),
-                            (("t", "t"), ("d", "d"), ("b", "b")),
-                            _fmt_functions(fmt_flags),
-                            "", " ")
+                    (("t", "t"), ("d", "d"), ("b", "b")),
+                    _fmt_functions(fmt_flags),
+                    "", " ")
 
 
 def _fmt_akrophonic(amt):
@@ -117,7 +107,7 @@ def _fmt_akrophonic(amt):
     num = [k for k, v in NUMERALS.items() if v <= amt][0]
 
     return [num] + _fmt_akrophonic(amt - NUMERALS[num])
-    
+
 
 def _fmt_fraction(amt):
     """ Format fractional obols as fractions. """
@@ -150,7 +140,7 @@ def _fmt_plural(amt, denominations):
 
     return denominations[1]
 
-    
+
 def _fmt_tdo(tdo, denominations, fmt_funcs, delim1, delim2):
     return delim2.join(
         [f"{func(amt)}{delim1}{_fmt_plural(amt, d)}"
