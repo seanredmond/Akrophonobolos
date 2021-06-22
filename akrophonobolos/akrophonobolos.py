@@ -183,8 +183,8 @@ def _fmt_akrophonic(amt):
 
 def _fmt_fraction(amt):
     """ Format fractional obols as fractions. """
-    if amt % 1 in (0.5, 0.25):
-        frac = "½" if amt % 1 == 0.5 else "¼"
+    if amt % 1 in (0.5, 0.25, 0.75):
+        frac = {0.25: "¼", 0.5: "½", 0.75: "¾"}[amt % 1]
         whole = int(amt // 1) if amt // 1 else ""
         return f"{whole}{frac}"
 

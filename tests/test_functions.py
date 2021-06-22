@@ -113,3 +113,9 @@ def test_valid_amount_str():
 def test_valid_greek_str():
     assert obol.valid_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
     assert not obol.valid_greek_amount("1Z")
+
+
+def test_fractions():
+    assert obol.format_amount(1) == "¼b"
+    assert obol.format_amount(2) == "½b"
+    assert obol.format_amount(3) == "¾b"
