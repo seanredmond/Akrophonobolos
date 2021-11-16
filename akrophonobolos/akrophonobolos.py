@@ -116,6 +116,9 @@ class Akro():
         # otherwise treat the divisor as a float and return an Akro
         return Akro(self.qo // float(other))
 
+    def __hash__(self):
+        return hash(self.qo)
+
 
 def _qo(*amt):
     """ Convert tuple amount to quarter obols. """
