@@ -92,6 +92,18 @@ class Akro():
     def __ne__(self, other):
         return self.qo != int(other)
 
+    def __lt__(self, other):
+        return self.qo < int(other)
+
+    def ___le__(self, other):
+        return self.qo <= int(other)
+
+    def __gt__(self, other):
+        return self.qo > int(other)
+
+    def __ge__(self, other):
+        return self.qo >= int(other)
+
     def __float__(self):
         return float(self.qo)
 
