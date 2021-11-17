@@ -221,7 +221,7 @@ def parse_greek_amount(amt):
 def format_amount(amt, fmt_flags=Fmt.ABBR | Fmt.FRACTION):
     """ Format ¼-obols for readability """
     if fmt_flags & Fmt.GREEK:
-        return "".join(_fmt_akrophonic(amt.limit_denominator(4)))
+        return "".join(_fmt_akrophonic(roundup_to_quarter_obol(amt)))
 
     if fmt_flags & Fmt.ENGLISH:
         return _fmt_tdo(rec_reduce(amt, FMT_TDO),
@@ -289,6 +289,57 @@ def interest(p, d, r=interest_rate(), roundup=True):
     return p * r * d
 
 
+def loan_term(p, i, r=interest_rate(), roundoff=True):
+    """ 
+    Calculate loan term in days if principal was p and interest i at rate r
+
+    Parameters
+    p       Amount of principal. Can be an instance of Khremata or anything 
+            that can be used to create an instance of Khremata
+    i       Amount of interest. Can be an instance of Khremata or anything 
+            that can be used to create an instance of Khremata
+    r       Simple interest rate, should be an instance of Fraction (but can 
+            be any number. Default value is the default returned by 
+            interest_rate()
+
+    """
+    if not isinstance(p, Khremata):
+        return loan_term(Khremata(p), i, r, roundoff)
+
+    if not isinstance(i, Khremata):
+        return loan_term(p, Khremata(i), r, roundoff)
+
+    if roundoff:
+        return round(i/(p*r))
+
+    return i/(p*r)
+
+
+def principal(i, d, r=interest_rate(), roundup=True):
+    """ 
+    Calculate the principal if loan returned i interest after d days at rate r
+
+    Parameters
+    i       Amount of principal. Can be an instance of Khremata or anything 
+            that can be used to create an instance of Khremata
+    d       Number of days over which to calculate interest
+    r       Simple interest rate, should be an instance of Fraction (but can 
+            be any number. Default value is the default returned by 
+            interest_rate()
+    roundup Boolean (default True). If True, result is rounded up to nearest 
+            quarter obolós. If False, the exact amount is returned
+
+    Return value will be an instance of Khremata.
+    """
+    if not isinstance(i, Khremata):
+        return principal(Khremata(i), d, r, roundup)
+
+    if roundup:
+        return roundup_to_quarter_obol(i/(d * r))
+    
+    return i/(d * r)
+
+
 def roundup_to_quarter_obol(o):
     """ 
     Roundup a value to the nearest quarter obol.
@@ -303,7 +354,7 @@ def roundup_to_quarter_obol(o):
     if isinstance(o, Khremata):
         return Khremata(roundup_to_quarter_obol(o.qo))
 
-    return round(o * 4)/4
+    return math.ceil(o * 4)/4
 
 
 def _fmt_akrophonic(amt):
@@ -312,7 +363,7 @@ def _fmt_akrophonic(amt):
 
     num = [k for k, v in NUMERALS.items() if v <= amt][0]
 
-    return [num] + _fmt_akrophonic((amt - NUMERALS[num]).limit_denominator(4))
+    return [num] + _fmt_akrophonic(amt - NUMERALS[num])
 
 
 def _fmt_fraction(amt):

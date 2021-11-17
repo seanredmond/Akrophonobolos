@@ -153,17 +153,64 @@ def test_interest():
     assert isinstance(obol.interest("1t 1748d", 17), obol.Khremata)
 
     # It should accept an instance of Khremata
+    assert obol.interest(obol.Khremata("5t"), 1) == 6
     assert obol.interest(obol.Khremata("1t 1748d"), 17) == 26.5
 
     # It should accept a string
+    assert obol.interest("5t", 1) == 6
     assert obol.interest("1t 1748d", 17) == 26.5
 
     # It should accept a number
-    assert obol.interest(46488, 17) == 26.5
+    assert obol.interest(180_000, 1) == 6
+    assert obol.interest(46_488, 17) == 26.5
 
     # It should let you calculate exactly
-    assert obol.interest(46488, 17, roundup=False) == 26.343200000000003
-    
+    assert obol.interest(180_000, 1, roundup=False) == 6
+    assert obol.interest(46_488, 17, roundup=False) == 26.343200000000003
+
+
+def test_principal():
+    # It should return an instance of Khremata
+    assert isinstance(obol.principal("1d", 1), obol.Khremata)
+
+    # It should accept an instance of Khremata
+    assert obol.principal(obol.Khremata("1d"), 1) == 180_000
+
+    # It should accept a string
+    assert obol.principal("1d", 1) == 180_000
+
+    # It should accept a number
+    assert obol.principal(6, 1) == 180_000
+
+    # It should let you calculate exactly
+    assert obol.principal(6, 1, roundup=False) == 180_000
+    assert obol.principal(26.5, 17, roundup=False) == 46764.70588235294
+
+
+def test_loan_term():
+    # It should return a float
+    # assert isinstance(obol.loan_term("5t", "1d"), float)
+
+    # It should accept instances of Khremata
+    assert obol.loan_term(obol.Khremata("5t"), obol.Khremata("1d")) == 1
+
+    # It should accept strings
+    assert obol.loan_term("5t", "1d") == 1
+
+    # It should accept numbers
+    assert obol.loan_term(180_000, 6) == 1
+
+    # It should accept a mix
+    assert obol.loan_term(obol.Khremata("5t"), "1d") == 1
+    assert obol.loan_term(obol.Khremata("5t"), 6) == 1
+    assert obol.loan_term("5t", obol.Khremata("1d")) == 1
+    assert obol.loan_term(180_000, obol.Khremata("1d")) == 1
+
+    # It should let you calculate exactly
+    assert obol.loan_term("5t", "1d", roundoff=False) == 1
+    assert float(obol.loan_term("3419d", "1d 5.5b", roundoff=False)) == \
+        16.817782977478796
+
 
 def test_roundup_to_quarter():
     # Should round up to the quarter obol
