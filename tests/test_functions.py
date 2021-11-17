@@ -126,3 +126,63 @@ def test_fractions():
     assert obol.format_amount(0.25) == "¼b"
     assert obol.format_amount(0.5) == "½b"
     assert obol.format_amount(0.75) == "¾b"
+
+
+def test_interest_rate():
+    # It should return a fraction
+    assert isinstance(obol.interest_rate(), Fraction)
+    
+    # With defaults it should be 1/30000
+    assert obol.interest_rate() == Fraction(1, 30_000)
+
+    # It should accept instances of Khremata
+    assert obol.interest_rate(obol.Khremata("2t")) == Fraction(1, 12_000)
+    assert obol.interest_rate(r=obol.Khremata("1t")) == Fraction(1, 5)
+
+    # It should accept strings
+    assert obol.interest_rate("2t") == Fraction(1, 12_000)
+    assert obol.interest_rate(r="1t") == Fraction(1, 5)
+
+    # It should accept numbers
+    assert obol.interest_rate(72_000) == Fraction(1, 12_000)
+    assert obol.interest_rate(r=3_6000) == Fraction(1, 5)
+
+
+def test_interest():
+    # It should return an instance of Khremata
+    assert isinstance(obol.interest("1t 1748d", 17), obol.Khremata)
+
+    # It should accept an instance of Khremata
+    assert obol.interest(obol.Khremata("1t 1748d"), 17) == 26.5
+
+    # It should accept a string
+    assert obol.interest("1t 1748d", 17) == 26.5
+
+    # It should accept a number
+    assert obol.interest(46488, 17) == 26.5
+
+    # It should let you calculate exactly
+    assert obol.interest(46488, 17, roundup=False) == 26.343200000000003
+    
+
+def test_roundup_to_quarter():
+    # Should round up to the quarter obol
+    assert obol.roundup_to_quarter_obol(26.343200000000003) == 26.5
+    assert obol.roundup_to_quarter_obol(26.1) == 26.25
+    assert obol.roundup_to_quarter_obol(26) == 26
+
+    # If given a Khremata, should return a Khremata
+    assert isinstance(
+        obol.roundup_to_quarter_obol(obol.Khremata(26.343200000000003)),
+        obol.Khremata)
+
+    # Otherwise should return a float
+    assert isinstance(obol.roundup_to_quarter_obol(26.343200000000003),
+                      float)
+    assert isinstance(obol.roundup_to_quarter_obol(26),
+                      float)
+    
+    
+    
+
+    

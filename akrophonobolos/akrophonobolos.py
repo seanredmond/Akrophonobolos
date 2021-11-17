@@ -1,5 +1,6 @@
 from enum import IntFlag
 from fractions import Fraction
+import math
 import re
 
 AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
@@ -47,18 +48,27 @@ FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 
 
 class Khremata():
-    def __init__(self, amt):
-        self.qo = self._parse_amt(amt)
+    def __init__(self, amt, limit=None):
+        self.qo = self._parse_amt(amt, limit)
 
-    def _parse_amt(self, amt):
+    def _parse_amt(self, amt, limit):
         if isinstance(amt, Fraction):
-            return amt
+            if limit is None:
+                return amt
+            amt.limit_denominator(limit)
         
         if isinstance(amt, int):
             return amt * Fraction(4, 4)
 
         if isinstance(amt, float):
-            return Fraction.from_float(amt) * Fraction(4, 4)
+            if limit is None:
+                return Fraction.from_float(amt) * Fraction(4, 4)
+            return Fraction.from_float(amt).limit_denominator(limit)
+
+        if isinstance(amt, Khremata):
+            if limit is None:
+                return amt.qo
+            return amt.qo.limit_denominator(limit)
         
 
         if valid_greek_amount(amt):
@@ -151,6 +161,9 @@ class Khremata():
         if isinstance(other, Khremata):
             return Khremata(self.qo * other.qo)
 
+        if isinstance(other, Fraction):
+            return Khremata(self.qo * other)
+
         return Khremata(self.qo * float(other))
 
 
@@ -208,7 +221,7 @@ def parse_greek_amount(amt):
 def format_amount(amt, fmt_flags=Fmt.ABBR | Fmt.FRACTION):
     """ Format ¼-obols for readability """
     if fmt_flags & Fmt.GREEK:
-        return "".join(_fmt_akrophonic(amt))
+        return "".join(_fmt_akrophonic(amt.limit_denominator(4)))
 
     if fmt_flags & Fmt.ENGLISH:
         return _fmt_tdo(rec_reduce(amt, FMT_TDO),
@@ -223,13 +236,83 @@ def format_amount(amt, fmt_flags=Fmt.ABBR | Fmt.FRACTION):
                     "", " ")
 
 
+def interest_rate(p=Khremata("5t"), d=1, r=Khremata("1d")):
+    """Calculate the simple interest rate that, given a principal amount
+    p returns r in d days
+
+    parameters:
+        p  Khremata
+        r  Khremata
+        d  int
+
+    Return value will be a fraction representing the amount of simple
+    interest returned in one day, so that principal * rate * days will
+    be the total amount of interest
+
+    Default values return the common rate: 5 tálanta in on day returns
+    1 drákhma.
+
+    """
+
+    if not isinstance(p, Khremata):
+        return interest_rate(Khremata(p), d, r)
+
+    if not isinstance(r, Khremata):
+        return interest_rate(p, d, Khremata(r))
+    
+    return r/(p*d)
+
+
+def interest(p, d, r=interest_rate(), roundup=True):
+    """ 
+    Calculate interest on principal p for d days at rate r
+
+    Parameters
+    p       Amount of principal. Can be an instance of Khremata or anything 
+            that can be used to create an instance of Khremata
+    d       Number of days over which to calculate interest
+    r       Simple interest rate, should be an instance of Fraction (but can 
+            be any number. Default value is the default returned by 
+            interest_rate()
+    roundup Boolean (default True). If True, result is rounded up to nearest 
+            quarter obolós. If False, the exact amount is returned
+
+    Return value will be an instance of Khremata.
+    """
+
+    if not isinstance(p, Khremata):
+        return interest(Khremata(p), d, r, roundup)
+
+    if roundup:
+        return roundup_to_quarter_obol(p * r * d)
+
+    return p * r * d
+
+
+def roundup_to_quarter_obol(o):
+    """ 
+    Roundup a value to the nearest quarter obol.
+
+    Parameters
+    o Value to be rounded (instance of Khremata, or any number)
+
+    If passed an instance of Khremata, the return value will also be an 
+    instance of Khremata. Otherwise the return value will be a float.
+    """
+
+    if isinstance(o, Khremata):
+        return Khremata(roundup_to_quarter_obol(o.qo))
+
+    return round(o * 4)/4
+
+
 def _fmt_akrophonic(amt):
     if not amt:
         return []
 
     num = [k for k, v in NUMERALS.items() if v <= amt][0]
 
-    return [num] + _fmt_akrophonic(amt - NUMERALS[num])
+    return [num] + _fmt_akrophonic((amt - NUMERALS[num]).limit_denominator(4))
 
 
 def _fmt_fraction(amt):
