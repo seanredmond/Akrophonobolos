@@ -3,6 +3,9 @@ from fractions import Fraction
 import math
 import re
 
+class UnparseableMonetaryString(Exception):
+    pass
+
 AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
     r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
@@ -77,7 +80,8 @@ class Khremata():
         if valid_amount_str(amt):
             return parse_amount(amt)
 
-        raise Exception("UNHANDLED")
+        raise UnparseableMonetaryString(
+            f"Cannot parse {amt} as monetary amount")
 
 
     def as_abbr(self, decimal=False):
@@ -116,6 +120,12 @@ class Khremata():
 
 
     def __eq__(self, other):
+        if isinstance(other, str):
+            try:
+                return self == Khremata(other)
+            except UnparseableMonetaryString:
+                return False
+            
         return self.qo == other
     
 

@@ -87,7 +87,9 @@ def test_eq():
     assert money == 40879.5
     assert money == money
     assert money == obol.Khremata("1t 813d 1.5b")
+    assert money == "1t 813d 1.5b"
     assert not money == 5
+    assert not money == "5b"
 
 
 def test_ne():
