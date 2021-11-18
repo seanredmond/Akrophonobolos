@@ -19,7 +19,8 @@ so Akrophonobolos simpfifies this.
     
 ## Usage
 
-Akrophonobols provides a class, `Khremata` (χρήματα, "money") and function for manipulating these.
+Akrophonobols provides a class, `Khremata` (χρήματα, "money") and
+function for manipulating these.
 
 ### Initializing
 
@@ -40,7 +41,8 @@ You can use upper or lowercase letters, and spaces do not matter:
     >>> obol.Khremata("1t813d1.5b")
     Khremata (1t 813d 1½b [= 40879.5 obols])
     
-You can use `o` for obols, but since this is too similar to a zero, `b` is better:
+You can use `o` for obols, but since this is too similar to a zero,
+`b` is better:
 
     >>> obol.Khremata("1t 813d 1.5o")
     Khremata (1t 813d 1½b [= 40879.5 obols])
@@ -55,14 +57,16 @@ to initialize an instance:
     >>> obol.Khremata(40879.5)
     Khremata (1t 813d 1½b [= 40879.5 obols])
 	
-Finally you can use a string of [Unicode Greek acrophonic numerals](https://en.wikipedia.org/wiki/Ancient_Greek_Numbers_(Unicode_block)):
+Finally you can use a string of [Unicode Greek acrophonic
+numerals](https://en.wikipedia.org/wiki/Ancient_Greek_Numbers_(Unicode_block)):
 
     >>> obol.Khremata("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
     Khremata (1t 813d 1½b [= 40879.5 obols])
     
 ### Formatting
 
-There are methods to format the value as an abbreviation, which is the default string representation:
+There are methods to format the value as an abbreviation, which is the
+default string representation:
 
     >>> m = obol.Khremata("1t 813d 1.5b")
     >>> m.as_abbr()
@@ -100,10 +104,65 @@ Comparisons:
 
     >>> obol.Khremata("1t") == obol.Khremata("1t")
     True
+    
     >>> obol.Khremata("1t") > obol.Khremata("3000d")
     True
+    
     >>> obol.Khremata("1t") < obol.Khremata("3000d")
     False
+    
+Most of these operators work both between two instance of `Khremata`
+and between a `Khremata` and anything that can be converted into a
+`Khremata`:
+
+    >>> obol.Khremata("1t") + "3000d"
+    Khremata (1t 3000d [= 54000.0 obols])
+   
+    >>> obol.Khremata("1t") - "ΧΧΧ"
+    Khremata (3000d [= 18000.0 obols])
+    
+    >>> obol.Khremata("1t") == 36000
+    True
+    
+    >>> 18000.0 < obol.Khremata("1t")
+    True
+    
+You cannot multiple two instances of `Khremata` since "talents
+squared" does not have any meaning (this raises an
+`UndefinedMonetaryOperation` error). If you divide a `Khremata` by a
+`Khremata` though the units cancel out and the operation returns a
+unitless `Fraction`:
+
+    >>> obol.Khremata("1500d") / obol.Khremata("1t")
+    Fraction(1, 4)
+    
+### Fractions
+
+Above, we said that the `Khremata` class stores the value internally
+as a (possibly fractional) number of _oboloí_. The more correct way to
+state that is that internally, the `Khremata` stores the value
+internally, in _oboloí_, as a Python
+[Fraction](https://docs.python.org/3/library/fractions.html). You can
+access this directly as the `b` property of the class. In many cases,
+of course, this will be a unit fraction:
+
+    >>> m = obol.Khremata("100t")
+    >>> m.b
+    Fraction(3600000, 1)
+    
+But monetary sums could be recorded down to the quarter-obol:
+
+    >>> m = obol.Khremata("1t 1d 1.25b")
+    >>> m.b
+    Fraction(144029, 4) 
+    
+which is the `Fraction` form of 36,007.25 _oboloí_. Storing the value
+as a `Fraction` avoid some issues with floating point math and better
+approximates how Ancient Greeks did math, since they did not use
+decimal numbers.
+   
+
+    
         
 ## Contributing
 
