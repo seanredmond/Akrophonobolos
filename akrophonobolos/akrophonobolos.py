@@ -6,6 +6,9 @@ import re
 class UnparseableMonetaryString(Exception):
     pass
 
+class UndefinedMonetaryOperation(Exception):
+    pass
+
 AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
     r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
@@ -179,6 +182,10 @@ class Khremata():
 
 
     def __mul__(self, other):
+        if isinstance(other, Khremata):
+            raise UndefinedMonetaryOperation("Cannot multiply two instances of"
+                                             " Khremata")
+
         if isinstance(other, Fraction):
             return Khremata(self.b * other)
 
