@@ -52,7 +52,7 @@ FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 
 class Khremata():
     def __init__(self, amt, limit=None):
-        self.qo = self._parse_amt(amt, limit)
+        self.b = self._parse_amt(amt, limit)
 
     def _parse_amt(self, amt, limit):
         if isinstance(amt, Fraction):
@@ -70,8 +70,8 @@ class Khremata():
 
         if isinstance(amt, Khremata):
             if limit is None:
-                return amt.qo
-            return amt.qo.limit_denominator(limit)
+                return amt.b
+            return amt.b.limit_denominator(limit)
 
         if valid_greek_amount(amt):
             return parse_greek_amount(amt)
@@ -85,37 +85,37 @@ class Khremata():
 
     def as_abbr(self, decimal=False):
         if decimal:
-            return format_amount(self.qo, Fmt.ABBR | Fmt.DECIMAL)
+            return format_amount(self.b, Fmt.ABBR | Fmt.DECIMAL)
 
-        return format_amount(self.qo, Fmt.ABBR)
+        return format_amount(self.b, Fmt.ABBR)
 
     
     def as_greek(self):
-        return format_amount(self.qo.limit_denominator(4), Fmt.GREEK)
+        return format_amount(self.b.limit_denominator(4), Fmt.GREEK)
 
 
     def as_phrase(self, decimal=False):
         if decimal:
-            return format_amount(self.qo, Fmt.ENGLISH | Fmt.DECIMAL)
+            return format_amount(self.b, Fmt.ENGLISH | Fmt.DECIMAL)
 
-        return format_amount(self.qo, Fmt.ENGLISH | Fmt.FRACTION)
+        return format_amount(self.b, Fmt.ENGLISH | Fmt.FRACTION)
 
 
     def __str__(self):
-        return format_amount(self.qo, Fmt.ABBR | Fmt.FRACTION)
+        return format_amount(self.b, Fmt.ABBR | Fmt.FRACTION)
 
 
     def __repr__(self):
         return (f"{self.__class__.__name__} ("
-                f"{self.__str__()} [= {float(self.qo)} obols])")
+                f"{self.__str__()} [= {float(self.b)} obols])")
 
 
     def __int__(self):
-        return int(self.qo.limit_denominator(1))
+        return int(self.b.limit_denominator(1))
 
 
     def __float__(self):
-        return float(self.qo)
+        return float(self.b)
 
 
     def __eq__(self, other):
@@ -125,69 +125,69 @@ class Khremata():
             except UnparseableMonetaryString:
                 return False
             
-        return self.qo == other
+        return self.b == other
     
 
     def __ne__(self, other):
-        return self.qo != other
+        return self.b != other
 
 
     def __lt__(self, other):
-        return self.qo < int(other)
+        return self.b < int(other)
 
 
     def ___le__(self, other):
-        return self.qo <= int(other)
+        return self.b <= int(other)
 
 
     def __gt__(self, other):
-        return self.qo > int(other)
+        return self.b > int(other)
 
 
     def __ge__(self, other):
-        return self.qo >= int(other)
+        return self.b >= int(other)
 
 
     def __float__(self):
-        return float(self.qo)
+        return float(self.b)
 
 
     def __add__(self, other):
         if isinstance(other, Khremata):
-            return Khremata(self.qo + other.qo)
+            return Khremata(self.b + other.b)
 
         return Khremata(float(self) + other)
 
 
     def __sub__(self, other):
         if isinstance(other, Khremata):
-            return Khremata(self.qo - other.qo)
+            return Khremata(self.b - other.b)
 
         return Khremata(float(self) - other)
 
 
     def __mul__(self, other):
         if isinstance(other, Khremata):
-            return Khremata(self.qo * other.qo)
+            return Khremata(self.b * other.b)
 
         if isinstance(other, Fraction):
-            return Khremata(self.qo * other)
+            return Khremata(self.b * other)
 
-        return Khremata(self.qo * float(other))
+        return Khremata(self.b * float(other))
 
 
     def __truediv__(self, other):
         # The units cancel out when an Akro id divided by an Akro, so
         # return a Fraction
         if isinstance(other, Khremata):
-            return Khremata(self.qo / other.qo).qo
+            return Khremata(self.b / other.b).b
 
         # otherwise treat the divisor as a float and return an Akro
-        return Khremata(self.qo / float(other))
+        return Khremata(self.b / float(other))
 
 
     def __hash__(self):
-        return hash(self.qo)
+        return hash(self.b)
 
 
 def _qo(*amt):
@@ -361,7 +361,7 @@ def roundup_to_quarter_obol(o):
     """
 
     if isinstance(o, Khremata):
-        return Khremata(roundup_to_quarter_obol(o.qo))
+        return Khremata(roundup_to_quarter_obol(o.b))
 
     return math.ceil(o * 4)/4
 

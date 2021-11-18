@@ -6,42 +6,42 @@ def test_init():
     # Initialize with string
 
     money = obol.Khremata("1t")
-    assert money.qo == Fraction(36000, 1)
+    assert money.b == Fraction(36000, 1)
 
     money = obol.Khremata("1d")
-    assert money.qo == Fraction(6, 1)
+    assert money.b == Fraction(6, 1)
 
     money = obol.Khremata("1b")
-    assert money.qo == Fraction(1, 1)
+    assert money.b == Fraction(1, 1)
 
     money = obol.Khremata("1.5b")
-    assert money.qo == Fraction(3, 2)
+    assert money.b == Fraction(3, 2)
 
     money = obol.Khremata("0.5b")
-    assert money.qo == Fraction(1, 2)
+    assert money.b == Fraction(1, 2)
 
     money = obol.Khremata("0.25b")
-    assert money.qo == Fraction(1, 4)
+    assert money.b == Fraction(1, 4)
 
     money = obol.Khremata("0.125b")
-    assert money.qo == Fraction(1, 8)
+    assert money.b == Fraction(1, 8)
     
     money = obol.Khremata("1t 813d 1.5b")
-    assert money.qo == Fraction(81759, 2)
+    assert money.b == Fraction(81759, 2)
 
     # Initialized with Greek
     money = obol.Khremata("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
-    assert money.qo == Fraction(81759, 2)
+    assert money.b == Fraction(81759, 2)
 
     # Initialized with number
     money = obol.Khremata(40879.5)
-    assert money.qo == Fraction(81759, 2)
+    assert money.b == Fraction(81759, 2)
 
     money = obol.Khremata(40880)
-    assert money.qo == 40880
+    assert money.b == 40880
     
     money = obol.Khremata(163518.1)
-    assert money.qo == Fraction(5618439134432461, 34359738368)
+    assert money.b == Fraction(5618439134432461, 34359738368)
 
 
 def test_str():
