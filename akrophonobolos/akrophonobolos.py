@@ -117,15 +117,15 @@ class Khremata():
     def __float__(self):
         return float(self.b)
 
-
     def __eq__(self, other):
-        if isinstance(other, str):
-            try:
-                return self == Khremata(other)
-            except UnparseableMonetaryString:
-                return False
+        if isinstance(other, Khremata):
+            return self.b == other.b
+
+        # b (a Fraction) must be specifically converted to a float
+        if isinstance(other, float):
+            return float(self.b) == other
             
-        return self.b == other
+        return self.b == Khremata(other).b
     
 
     def __ne__(self, other):
@@ -133,19 +133,31 @@ class Khremata():
 
 
     def __lt__(self, other):
-        return self.b < int(other)
+        if isinstance(other, Khremata):
+            return self.b < other.b
+
+        return self.b < Khremata(other).b
 
 
     def ___le__(self, other):
-        return self.b <= int(other)
+        if isinstance(other, Khremata):
+            return self.b <= other.b
+
+        return self.b <= Khremata(other).b
 
 
     def __gt__(self, other):
-        return self.b > int(other)
+        if isinstance(other, Khremata):
+            return self.b > other.b
+
+        return self.b > Khremata(other).b
 
 
     def __ge__(self, other):
-        return self.b >= int(other)
+        if isinstance(other, Khremata):
+            return self.b >= other.b
+
+        return self.b >= Khremata(other).b
 
 
     def __float__(self):
@@ -156,20 +168,17 @@ class Khremata():
         if isinstance(other, Khremata):
             return Khremata(self.b + other.b)
 
-        return Khremata(float(self) + other)
+        return Khremata(self.b + Khremata(other).b)
 
 
     def __sub__(self, other):
         if isinstance(other, Khremata):
             return Khremata(self.b - other.b)
 
-        return Khremata(float(self) - other)
+        return Khremata(self.b - Khremata(other).b)
 
 
     def __mul__(self, other):
-        if isinstance(other, Khremata):
-            return Khremata(self.b * other.b)
-
         if isinstance(other, Fraction):
             return Khremata(self.b * other)
 
@@ -177,12 +186,12 @@ class Khremata():
 
 
     def __truediv__(self, other):
-        # The units cancel out when an Akro id divided by an Akro, so
-        # return a Fraction
+        # The units cancel out when a Khremata id divided by a
+        # Khremata, so return a Fraction
         if isinstance(other, Khremata):
             return Khremata(self.b / other.b).b
 
-        # otherwise treat the divisor as a float and return an Akro
+        # otherwise treat the divisor as a float and return an Khremata
         return Khremata(self.b / float(other))
 
 
