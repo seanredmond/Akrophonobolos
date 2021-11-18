@@ -39,14 +39,14 @@ def is_equation(input):
 
 def recurse_calc(eq):
     if len(eq) == 1:
-        return obol.Akro(eq[0])
+        return obol.Khremata(eq[0])
 
     if len(eq) > 1:
         if eq[1] == "+":
-            return obol.Akro(eq[0]) + recurse_calc(eq[2:])
+            return obol.Khremata(eq[0]) + recurse_calc(eq[2:])
 
         if eq[1] == "-":
-            return obol.Akro(eq[0]) - recurse_calc(eq[2:])
+            return obol.Khremata(eq[0]) - recurse_calc(eq[2:])
 
         raise UnexpectedInput(f"Expected '+' or '-', got '{eq[1]}'")
 
@@ -71,7 +71,7 @@ def main():
 
     for i in args.input:
         if detect_type(i) in (INPUT_T.ACRO, INPUT_T.STR):
-            p = obol.Akro(i)
+            p = obol.Khremata(i)
 
             if detect_type(i) == INPUT_T.ACRO:
                 print(f"{i} = {p.as_phrase()}")

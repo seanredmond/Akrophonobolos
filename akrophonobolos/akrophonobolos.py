@@ -72,7 +72,6 @@ class Khremata():
             if limit is None:
                 return amt.qo
             return amt.qo.limit_denominator(limit)
-        
 
         if valid_greek_amount(amt):
             return parse_greek_amount(amt)
