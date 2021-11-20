@@ -345,9 +345,9 @@ def principal(i, d, r=interest_rate(), roundup=True):
     Calculate the principal if loan returned i interest after d days at rate r
 
     Parameters
-    i       Amount of principal. Can be an instance of Khremata or anything 
+    i       Amount of interest. Can be an instance of Khremata or anything 
             that can be used to create an instance of Khremata
-    d       Number of days over which to calculate interest
+    d       Number of days from which to calculate principal
     r       Simple interest rate, should be an instance of Fraction (but can 
             be any number. Default value is the default returned by 
             interest_rate()
