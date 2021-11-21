@@ -10,7 +10,7 @@ _obolós_ (ὀβολός, or obol). Six _oboloí_ made a _drakhmḗ_, and 6,000
 _drakhmaí_ a _tálanton_ (which was 57 lbs. of silver).
 
 Large sums of money are found in forms like “1 _tálanton_ 813
-_drakhmaí_ 1½ _oboloí_.” Math with these figure can be very annoying,
+_drakhmaí_ 1½ _oboloí_.” Math with these figures can be very annoying,
 so Akrophonobolos simpfifies this.
 
 ## Installation
@@ -20,7 +20,7 @@ so Akrophonobolos simpfifies this.
 ## Usage
 
 Akrophonobolos provides a class, `Khremata` (χρήματα, "money") and
-function for manipulating these.
+function for manipulating instances of this class.
 
 ### Initializing
 
@@ -127,7 +127,7 @@ and between a `Khremata` and anything that can be converted into a
     >>> 18000.0 < obol.Khremata("1t")
     True
     
-You cannot multiple two instances of `Khremata` since "talents
+You cannot multiply two instances of `Khremata` since "talents
 squared" does not have any meaning (this raises an
 `UndefinedMonetaryOperation` error). If you divide a `Khremata` by a
 `Khremata` though the units cancel out and the operation returns a
@@ -140,8 +140,8 @@ unitless `Fraction`:
 
 Above, we said that the `Khremata` class stores the value internally
 as a (possibly fractional) number of _oboloí_. The more correct way to
-state that is that internally, the `Khremata` stores the value
-internally, in _oboloí_, as a Python
+state that is that internally, the `Khremata` class stores the value,
+in _oboloí_, as a Python
 [Fraction](https://docs.python.org/3/library/fractions.html). You can
 access this directly as the `b` property of the class. In many cases,
 of course, this will be a unit fraction:
@@ -172,15 +172,16 @@ from the money held in the Parthenon and temples of other gods to the
 Athenian state. Loans were made at simple interest, most commonly at
 the rate of 1 _drakhmḗ_ per 5 _tálanta_ per day.
 
-Akrophonobolos provides functions for working with loans. To start, you
-can calculate a more useful version of the rate. Given an amount of
-principal, a number of days, and an amount of interest to be returned,
-you get back the amount of simple interest to be added for one day:
+Akrophonobolos provides functions for working with loans like this. To
+start, you can calculate a more useful version of the rate. Given an
+amount of principal, a number of days, and an amount of interest to be
+returned, you get back the amount of simple interest to be added for
+one day:
 
     >>> obol.interest_rate("5t", 1, "1d")
     Fraction(1, 30000)
     
-That is, the simple interest rate is 1/30,000th of the principal per day.
+That is, the interest is 1/30,000th of the principal per day.
     
 For any loan, the amount of interest is simply the principal times the
 rate times the term of the loan. If we borrowed 25 _tálanta_ for a
@@ -197,7 +198,7 @@ Of course Akrophonobolos has a function for this:
     >>> obol.interest(obol.Khremata("25t"), 365, rate)
     Khremata (1825d [= 10950.0 obols])
 
-And 1/30000th is the default rate, so you can leave it out if that's
+1/30000th is the default rate, so you can leave it out if that's
 the rate you're using:
 
     >>> obol.interest(obol.Khremata("25t"), 365)
