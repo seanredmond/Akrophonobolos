@@ -2,6 +2,7 @@ from enum import IntFlag
 from fractions import Fraction
 import math
 import re
+from akrophonobolos.__version__ import __version__
 
 class UnparseableMonetaryString(Exception):
     pass
@@ -427,3 +428,7 @@ def _fmt_tdo(tdo, denominations, fmt_funcs, delim1, delim2):
     return delim2.join(
         [f"{func(amt)}{delim1}{_fmt_plural(amt, d)}"
          for amt, d, func in zip(tdo, denominations, fmt_funcs) if amt])
+
+
+def version():
+    return __version__

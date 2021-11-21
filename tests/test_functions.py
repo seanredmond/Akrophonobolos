@@ -1,6 +1,9 @@
 import akrophonobolos as obol
 from fractions import Fraction
 
+def test_version():
+    assert obol.version == 'aSDSD'
+
 
 def test_parse_amt():
     assert obol.parse_amount("1T") == 36_000
