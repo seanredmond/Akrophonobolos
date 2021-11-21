@@ -12,7 +12,7 @@ def money(s):
 
 def spread(d, s):
     return range(d - s, d + s + 1)
-    
+
 
 def calculate_interest(args, rate):
     per_diem = args.principal * rate
@@ -46,13 +46,12 @@ def calculate_principal(args, rate):
                           s,
                           args.interest)
         return
-    
+
     format_output(obol.principal(args.interest, args.days, rate),
                   args.interest/args.days,
                   args.days,
                   args.interest)
-                  
-    
+
 
 def format_output(p, r, d, i):
     print(f"{p.as_greek()} ({p.as_abbr()}) "
@@ -105,8 +104,6 @@ def main():
     if all((args.rate, args.days, args.interest)) and not args.principal:
         calculate_principal(args, rate)
         return
-    
-    
 
 
 if __name__ == "__main__":

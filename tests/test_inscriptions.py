@@ -2,6 +2,7 @@ import akrophonobolos as obol
 from fractions import Fraction
 import pytest
 
+
 def test_ig_I_3_369_7():
     # 𐅊· τόκος τούτον ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ
     assert obol.loan_term("𐅊", "ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ") == 1397
@@ -9,12 +10,9 @@ def test_ig_I_3_369_7():
     assert obol.principal("ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ", 1397) == obol.Khremata("𐅊")
 
 
+@pytest.mark.xfail(reason="Different from restorated text")
 def test_ig_I_3_369_7_8():
     # 𐅉[𐅉𐅈ΤΤΤ𐅆𐅅ΗΔΙΙΙ𐅁]· τόκος τούτον ΤΧ𐅅ΗΗΔ𐅃𐅂𐅂𐅂𐅂ΙΙ
-    print(obol.Khremata("𐅉𐅉𐅈ΤΤΤ𐅆𐅅ΗΔΙΙΙ𐅁"))
-    print(obol.Khremata("𐅉𐅉𐅈ΤΤΤ𐅆𐅅ΗΔΙΙΙ𐅁").b)
-    print(obol.principal("ΤΧ𐅅ΗΗΔ𐅃𐅂𐅂𐅂𐅂ΙΙ", 1349))
-    print(obol.principal("ΤΧ𐅅ΗΗΔ𐅃𐅂𐅂𐅂𐅂ΙΙ", 1349).b)
     assert obol.principal("ΤΧ𐅅ΗΗΔ𐅃𐅂𐅂𐅂𐅂ΙΙ", 1349) == "𐅉𐅉𐅈ΤΤΤ𐅆𐅅ΗΔΙΙΙ𐅁"
 
 
@@ -36,15 +34,15 @@ def test_id_I_3_369_88():
         11.621766666666666
 
     assert obol.principal("𐅂ΙΙΙΙΙ𐅁", 17, roundup=False) == 20294.11764705882
-    
 
-@pytest.mark.xfail(reason = "Different rounding")
+
+@pytest.mark.xfail(reason="Different rounding")
 def test_id_I_3_369_88_rounded_interest():
     # 1d 5¾b vs. 1d 5½b
     assert obol.interest("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι", 17) == obol.Khremata("𐅂ΙΙΙΙΙ𐅁")
 
 
-@pytest.mark.xfail(reason = "Different rounding")
+@pytest.mark.xfail(reason="Different rounding")
 def test_id_I_3_369_88_rounded_principal():
     # 3382d 2¼b vs 3418d 1b
     assert obol.principal("𐅂ΙΙΙΙΙ𐅁", 17) == obol.Khremata("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι")

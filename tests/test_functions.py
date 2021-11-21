@@ -1,8 +1,9 @@
 import akrophonobolos as obol
 from fractions import Fraction
 
+
 def test_version():
-    assert obol.version == 'aSDSD'
+    assert obol.version() == "0.0.1"
 
 
 def test_parse_amt():
@@ -134,7 +135,7 @@ def test_fractions():
 def test_interest_rate():
     # It should return a fraction
     assert isinstance(obol.interest_rate(), Fraction)
-    
+
     # With defaults it should be 1/30000
     assert obol.interest_rate() == Fraction(1, 30_000)
 
@@ -231,8 +232,3 @@ def test_roundup_to_quarter():
                       float)
     assert isinstance(obol.roundup_to_quarter_obol(26),
                       float)
-    
-    
-    
-
-    

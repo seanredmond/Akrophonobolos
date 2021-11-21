@@ -9,6 +9,7 @@ from sys import exit
 class UnexpectedEndOfEquation(Exception):
     pass
 
+
 class UnexpectedInput(Exception):
     pass
 

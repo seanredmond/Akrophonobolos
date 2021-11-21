@@ -4,11 +4,14 @@ import math
 import re
 from akrophonobolos.__version__ import __version__
 
+
 class UnparseableMonetaryString(Exception):
     pass
 
+
 class UndefinedMonetaryOperation(Exception):
     pass
+
 
 AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
@@ -63,7 +66,7 @@ class Khremata():
             if limit is None:
                 return amt
             amt.limit_denominator(limit)
-        
+
         if isinstance(amt, int):
             return amt * Fraction(4, 4)
 
@@ -86,17 +89,14 @@ class Khremata():
         raise UnparseableMonetaryString(
             f"Cannot parse {amt} as monetary amount")
 
-
     def as_abbr(self, decimal=False):
         if decimal:
             return format_amount(self.b, Fmt.ABBR | Fmt.DECIMAL)
 
         return format_amount(self.b, Fmt.ABBR)
 
-    
     def as_greek(self):
         return format_amount(self.b.limit_denominator(4), Fmt.GREEK)
-
 
     def as_phrase(self, decimal=False):
         if decimal:
@@ -104,19 +104,15 @@ class Khremata():
 
         return format_amount(self.b, Fmt.ENGLISH | Fmt.FRACTION)
 
-
     def __str__(self):
         return format_amount(self.b, Fmt.ABBR | Fmt.FRACTION)
-
 
     def __repr__(self):
         return (f"{self.__class__.__name__} ("
                 f"{self.__str__()} [= {float(self.b)} obols])")
 
-
     def __int__(self):
         return int(self.b.limit_denominator(1))
-
 
     def __float__(self):
         return float(self.b)
@@ -128,13 +124,11 @@ class Khremata():
         # b (a Fraction) must be specifically converted to a float
         if isinstance(other, float):
             return float(self.b) == other
-            
+
         return self.b == Khremata(other).b
-    
 
     def __ne__(self, other):
         return self.b != other
-
 
     def __lt__(self, other):
         if isinstance(other, Khremata):
@@ -142,13 +136,11 @@ class Khremata():
 
         return self.b < Khremata(other).b
 
-
     def ___le__(self, other):
         if isinstance(other, Khremata):
             return self.b <= other.b
 
         return self.b <= Khremata(other).b
-
 
     def __gt__(self, other):
         if isinstance(other, Khremata):
@@ -156,17 +148,14 @@ class Khremata():
 
         return self.b > Khremata(other).b
 
-
     def __ge__(self, other):
         if isinstance(other, Khremata):
             return self.b >= other.b
 
         return self.b >= Khremata(other).b
 
-
     def __float__(self):
         return float(self.b)
-
 
     def __add__(self, other):
         if isinstance(other, Khremata):
@@ -174,13 +163,11 @@ class Khremata():
 
         return Khremata(self.b + Khremata(other).b)
 
-
     def __sub__(self, other):
         if isinstance(other, Khremata):
             return Khremata(self.b - other.b)
 
         return Khremata(self.b - Khremata(other).b)
-
 
     def __mul__(self, other):
         if isinstance(other, Khremata):
@@ -192,7 +179,6 @@ class Khremata():
 
         return Khremata(self.b * float(other))
 
-
     def __truediv__(self, other):
         # The units cancel out when a Khremata id divided by a
         # Khremata, so return a Fraction
@@ -202,14 +188,15 @@ class Khremata():
         # otherwise treat the divisor as a float and return an Khremata
         return Khremata(self.b / float(other))
 
-
     def __hash__(self):
         return hash(self.b)
 
 
 def _qo(*amt):
-    """ Convert tuple amount to quarter obols. """
-    return amt[0] * Fraction(36_000, 1) + amt[1] * Fraction(6, 1) + Fraction(amt[2])
+    """ Convert tuple amount to fractional obols. """
+    return amt[0] * Fraction(36_000, 1) + \
+        amt[1] * Fraction(6, 1) + \
+        Fraction(amt[2])
 
 
 def rec_reduce(amt, denominations):
@@ -285,22 +272,22 @@ def interest_rate(p=Khremata("5t"), d=1, r=Khremata("1d")):
 
     if not isinstance(r, Khremata):
         return interest_rate(p, d, Khremata(r))
-    
+
     return r/(p*d)
 
 
 def interest(p, d, r=interest_rate(), roundup=True):
-    """ 
+    """
     Calculate interest on principal p for d days at rate r
 
     Parameters
-    p       Amount of principal. Can be an instance of Khremata or anything 
+    p       Amount of principal. Can be an instance of Khremata or anything
             that can be used to create an instance of Khremata
     d       Number of days over which to calculate interest
-    r       Simple interest rate, should be an instance of Fraction (but can 
-            be any number. Default value is the default returned by 
+    r       Simple interest rate, should be an instance of Fraction (but can
+            be any number. Default value is the default returned by
             interest_rate()
-    roundup Boolean (default True). If True, result is rounded up to nearest 
+    roundup Boolean (default True). If True, result is rounded up to nearest
             quarter obolós. If False, the exact amount is returned
 
     Return value will be an instance of Khremata.
@@ -316,18 +303,17 @@ def interest(p, d, r=interest_rate(), roundup=True):
 
 
 def loan_term(p, i, r=interest_rate(), roundoff=True):
-    """ 
+    """
     Calculate loan term in days if principal was p and interest i at rate r
 
     Parameters
-    p       Amount of principal. Can be an instance of Khremata or anything 
+    p       Amount of principal. Can be an instance of Khremata or anything
             that can be used to create an instance of Khremata
-    i       Amount of interest. Can be an instance of Khremata or anything 
+    i       Amount of interest. Can be an instance of Khremata or anything
             that can be used to create an instance of Khremata
-    r       Simple interest rate, should be an instance of Fraction (but can 
-            be any number. Default value is the default returned by 
+    r       Simple interest rate, should be an instance of Fraction (but can
+            be any number. Default value is the default returned by
             interest_rate()
-
     """
     if not isinstance(p, Khremata):
         return loan_term(Khremata(p), i, r, roundoff)
@@ -342,17 +328,17 @@ def loan_term(p, i, r=interest_rate(), roundoff=True):
 
 
 def principal(i, d, r=interest_rate(), roundup=True):
-    """ 
+    """
     Calculate the principal if loan returned i interest after d days at rate r
 
     Parameters
-    i       Amount of interest. Can be an instance of Khremata or anything 
+    i       Amount of interest. Can be an instance of Khremata or anything
             that can be used to create an instance of Khremata
     d       Number of days from which to calculate principal
-    r       Simple interest rate, should be an instance of Fraction (but can 
-            be any number. Default value is the default returned by 
+    r       Simple interest rate, should be an instance of Fraction (but can
+            be any number. Default value is the default returned by
             interest_rate()
-    roundup Boolean (default True). If True, result is rounded up to nearest 
+    roundup Boolean (default True). If True, result is rounded up to nearest
             quarter obolós. If False, the exact amount is returned
 
     Return value will be an instance of Khremata.
@@ -362,18 +348,18 @@ def principal(i, d, r=interest_rate(), roundup=True):
 
     if roundup:
         return roundup_to_quarter_obol(i/(d * r))
-    
+
     return i/(d * r)
 
 
 def roundup_to_quarter_obol(o):
-    """ 
+    """
     Roundup a value to the nearest quarter obol.
 
     Parameters
     o Value to be rounded (instance of Khremata, or any number)
 
-    If passed an instance of Khremata, the return value will also be an 
+    If passed an instance of Khremata, the return value will also be an
     instance of Khremata. Otherwise the return value will be a float.
     """
 
@@ -405,7 +391,7 @@ def _fmt_fraction(amt):
 def _fmt_decimal(amt):
     """ Format fractional obols as decimals. """
     if float(amt) % 1:
-         return float(amt)
+        return float(amt)
 
     return int(amt)
 
