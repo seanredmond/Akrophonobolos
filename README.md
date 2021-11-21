@@ -157,7 +157,7 @@ But monetary sums could be recorded down to the quarter-obol:
     Fraction(144029, 4) 
     
 which is the `Fraction` form of 36,007.25 _oboloí_. Storing the value
-as a `Fraction` avoid some issues with floating point math and better
+as a `Fraction` avoids some issues with floating point math and better
 approximates how Ancient Greeks did math, since they did not use
 decimal numbers.
 
@@ -166,13 +166,13 @@ decimal numbers.
 
 Figures in _tálanta_, _drakhmaí_, and _oboloí_ are found in many
 ancient Athenian inscriptions, and the most interesting of these
-involve loans, such as the so-called "Logistai Inscription" ([ IG I³
-369 ](https://epigraphy.packhum.org/text/381)) which records loans
+involve loans, such as the so-called "Logistai Inscription" ([IG I³
+369](https://epigraphy.packhum.org/text/381)) which records loans
 from the money held in the Parthenon and temples of other gods to the
 Athenian state. Loans were made at simple interest, most commonly at
 the rate of 1 _drakhmḗ_ per 5 _tálanta_ per day.
 
-Akrophonobolos provides function for working with loans. To start, you
+Akrophonobolos provides functions for working with loans. To start, you
 can calculate a more useful version of the rate. Given an amount of
 principal, a number of days, and an amount of interest to be returned,
 you get back the amount of simple interest to be added for one day:
@@ -182,9 +182,9 @@ you get back the amount of simple interest to be added for one day:
     
 That is, the simple interest rate is 1/30,000th of the principal per day.
     
-For any loan, the amount of interest is simple the principal times the
+For any loan, the amount of interest is simply the principal times the
 rate times the term of the loan. If we borrowed 25 _tálanta_ for a
-year at the comon rate we would be expected to pay 1,825 _drakhmaí_ of
+year at the common rate we would be expected to pay 1,825 _drakhmaí_ of
 interest:
 
     >>> rate = obol.interest_rate("5t", 1, "1d")
@@ -203,15 +203,20 @@ the rate you're using:
     >>> obol.interest(obol.Khremata("25t"), 365)
     Khremata (1825d [= 10950.0 obols])
     
+And instead of an instance of `Khremata` you can provide something that can be turned into a `Khremata`:
+
+    >>> obol.interest("25t", 365)
+    Khremata (1825d [= 10950.0 obols])
+    
 If you have the interest and the rate, you can use those to get the principal:
 
-    >>> obol.principal(obol.Khremata("1825d"), 365)
+    >>> obol.principal("1825d", 365)
     Khremata (25t [= 900000.0 obols])
-    
-And if you have the principal and the interest, you can get the loan
+	
+If you have the principal and the interest, you can get the loan
 term, in days:
 
-    >>> obol.loan_term(obol.Khremata("25t"), obol.Khremata("1825d"))
+    >>> obol.loan_term("25t", "1825d")
     365
     
 This last scenario is what we usually find in the inscriptions. For
@@ -225,14 +230,6 @@ can plug these values into `loan_term()` and see the the loan was for
 
     >>> obol.loan_term("𐅊", "ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ")
     1397
-    
-Note that for monetary values these function accept instances of
-`Khremata` or anything that can be turned into an instance of
-`Khremata` so any of these would work:
-
-    obol.loan_term("𐅊", "ΤΤΧ𐅅ΗΗΗΗ𐅄ΔΔ")
-    obol.loan_term("50t", "2t1970d")
-    obol.loan_term(1800000, 83820)
     
 ### Fractions, part 2: Rounding
 
@@ -254,7 +251,7 @@ Now, if we want to double-check this:
 We get an answer that is ¼ _obolós_ too high (11.75 instead of
 11.5). We do not know how the ancient Greeks did this math, how they
 rounded, or what kind of approximations they used. The smallest unit
-they recorded was ¼ _obolós_, so Akrohobolos the `interest()` and
+they recorded was ¼ _obolós_, so in Akrohobolos the `interest()` and
 `principal()` functions round up to this by default. You can get an
 unrounded answer:
 
@@ -274,8 +271,11 @@ play around with Akrophonobolos and figure out how they arrived at
 
 `loan_term()` rounds to the nearest integer, but you can change this as well:
 
-    >>> obol.loan_term("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι", "𐅂ΙΙΙΙΙ𐅁", roundoff=False)
+	>>> term = obol.loan_term("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι", "𐅂ΙΙΙΙΙ𐅁", roundoff=False)
+    >>> term
     Fraction(345000, 20509)
+    >>> float(term)
+    16.82188307572285
     
 ## Command Line Scripts
 
@@ -285,7 +285,7 @@ interest
 
 ### `obol`
 
-If you give `obol` one or more amounts in either akrophonisc numerals
+If you give `obol` one or more amounts in either akrophonic numerals
 or abbreviated with "t", "d" and "b" (or "o"), it will show the
 equivalent forms
 
