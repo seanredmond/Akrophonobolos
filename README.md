@@ -144,7 +144,8 @@ state that is that internally, the `Khremata` class stores the value,
 in _oboloí_, as a Python
 [Fraction](https://docs.python.org/3/library/fractions.html). You can
 access this directly as the `b` property of the class. In many cases,
-of course, this will be a unit fraction:
+of course, this fraction is equivalent to a whole number (with a
+denominator of 1):
 
     >>> m = obol.Khremata("100t")
     >>> m.b
