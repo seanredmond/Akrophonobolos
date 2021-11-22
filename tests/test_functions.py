@@ -19,8 +19,12 @@ def test_parse_amt():
     assert obol.parse_amount("1T1.5O") == 36_001.5
     assert obol.parse_amount("813D1.5O") == 4_879.5
 
-    assert obol.parse_amount("1T813D1.5O") == 40879.5
-    assert obol.parse_amount("1t 813d 1.5b") == 40879.5
+    assert obol.parse_amount("1T813D1½O") == 40879.5
+    assert obol.parse_amount("1t 813d 1½b") == 40879.5
+    assert obol.parse_amount("1T813D1½O") == 40879.5
+    assert obol.parse_amount("1t 813d 1½b") == 40879.5
+    assert obol.parse_amount("1t 813d 1¼b") == 40879.25
+    assert obol.parse_amount("1t 813d ½b") == 40878.5
 
 
 def test_parse_amt_obol_rounding():

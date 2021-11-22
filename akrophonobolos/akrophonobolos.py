@@ -13,7 +13,7 @@ class UndefinedMonetaryOperation(Exception):
     pass
 
 
-AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?)(O|B))?\Z", re.I)
+AMT = re.compile(r"\A((\d+)T ?)?((\d+)D ?)?((\d+(\.\d+)?|\d*[½¼])(O|B))?\Z", re.I)
 GREEK_AMT = re.compile(
     r"\A[\u0394\u0397\u0399\u03a4\u03a7\U00010140-\U0001014E]+\Z")
 
@@ -221,10 +221,25 @@ def parse_amount(amt):
     amt_match = AMT.match(amt)
     talents = 0 if amt_match[2] is None else int(amt_match[2])
     drachmas = 0 if amt_match[4] is None else int(amt_match[4])
-    obols = 0 if amt_match[6] is None else float(amt_match[6])
+    obols = 0 if amt_match[6] is None else _parse_obols(amt_match[6])
 
     return _qo(talents, drachmas, obols)
 
+
+def _parse_obols(amt):
+    """ Parse string amount that may contain vulgar fractions. """
+    
+    if "½" in amt or "¼" in amt:
+        if amt == "½":
+            return 0.5
+
+        if amt == "¼":
+            return 0.25
+
+        return float(amt.replace("½", ".5").replace("¼", ".25"))
+
+    return float(amt)
+    
 
 def parse_greek_amount(amt):
     """ Parse Unicode Greek acrophonic numeral. """

@@ -43,6 +43,20 @@ def test_init():
     money = obol.Khremata(163518.1)
     assert money.b == Fraction(5618439134432461, 34359738368)
 
+    money = obol.Khremata("1½b")
+    assert money.b == Fraction(3, 2)
+
+    money = obol.Khremata("½b")
+    assert money.b == Fraction(1, 2)
+
+    money = obol.Khremata("¼b")
+    assert money.b == Fraction(1, 4)
+
+    money = obol.Khremata("1t 813d 1½b")
+    assert money.b == Fraction(81759, 2)
+    
+
+    
 
 def test_str():
     money = obol.Khremata("1t 813d 1.5b")
