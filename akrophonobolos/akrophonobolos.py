@@ -19,6 +19,7 @@ GREEK_AMT = re.compile(
 
 
 class Fmt(IntFlag):
+    """Flags for use in formatting"""
     GREEK = 16
     ENGLISH = 8
     ABBR = 4
@@ -56,7 +57,6 @@ FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 # # Not used:
 # # 10147 𐅇 GREEK ACROPHONIC ATTIC FIFTY THOUSAND
 
-
 class Khremata():
     """Represents a monetary amount in Greek talents, drakhmas, and obols."""
     def __init__(self, amt, limit=None):
@@ -64,6 +64,7 @@ class Khremata():
         :type amt: str, float, int, fraction.Fraction, Khremata
         :param limit: max denominator for fractions
         :type limit: int
+        :raise UnparseableMonetaryString: If `amt` cannot be parsed
 
 
         The amount can be provided as an integer number or fractional
@@ -322,8 +323,29 @@ def parse_greek_amount(amt):
     return sum([NUMERALS[c] for c in list(amt)])
 
 
-def format_amount(amt, fmt_flags=Fmt.ABBR | Fmt.FRACTION):
-    """ Format ¼-obols for readability """
+def format_amount(amt, fmt_flags=Fmt.ABBR|Fmt.FRACTION):
+    """Format monetary amount as a string
+
+    :param amt: Monetary string
+    :type amt: str
+    :param fmt_flags: Flags for formatting options defaults to `Fmt.ABBREV` | `Fmt.FRACTION`
+    :type fmt_flags: Fmt
+    :return: A string formatted string representation
+    :rtype: str
+
+    Amount can be formatted as Greek akrophonic numerals, an English
+    phrase, or an English abbrevation with :py:flag:mem:`Fmt.GREEK`,
+    :py:flag:mem:`Fmt.ENGLISH`, and :py:flag:mem:`Fmt.ABBR`
+    respectively.
+
+    :py:flag:mem:`Fmt.ENGLISH` and :py:flag:mem:`Fmt.ABBR` can be
+    combined with :py:flag:mem:`Fmt.FRACTION` to format partial obols
+    as fractions or with :py:flag:mem:`Fmt.DECIMAL` to format them as
+    decimal numbers. :py:flag:mem:`Fmt.FRACTION` and
+    :py:flag:mem:`Fmt.DECIMAL` have no effect when combined with
+    :py:flag:mem:`Fmt.GREEK`
+
+    """
     if fmt_flags & Fmt.GREEK:
         return "".join(_fmt_akrophonic(roundup_to_quarter_obol(amt)))
 
@@ -344,17 +366,20 @@ def interest_rate(p=Khremata("5t"), d=1, r=Khremata("1d")):
     """Calculate the simple interest rate that, given a principal amount
     p returns r in d days
 
-    parameters:
-        p  Khremata
-        r  Khremata
-        d  int
+    :param p:  Amount of principal. Defaults to 5 *tálanta*
+    :type p: str, float, int, fraction.Fraction, Khremata
+    :param d: Number of days over which to calculate interest. Defaults to 1 day
+    :type d: int
+    :param r: Amount of interest. Defaults to 1 *drakhma*
+    :type r: str, float, int, fraction.Fraction, Khremata
+    :rtype: fractions.Fraction
 
     Return value will be a fraction representing the amount of simple
     interest returned in one day, so that principal * rate * days will
     be the total amount of interest
 
-    Default values return the common rate: 5 tálanta in on day returns
-    1 drákhma.
+    Default values return the common rate: 5 *tálanta* in one day returns
+    1 *drákhma*.
 
     """
 
@@ -428,7 +453,7 @@ def principal(i, d, r=interest_rate(), roundup=True):
     :type r: fractions.Fraction, int, float
     :param roundup: If True, result is rounded up to nearest quarter obolós. If False, the exact amount is returned
     :type roundup: bool
-    :rtype: Kremata
+    :rtype: Khremata
 
     """
     if not isinstance(i, Khremata):
@@ -441,14 +466,16 @@ def principal(i, d, r=interest_rate(), roundup=True):
 
 
 def roundup_to_quarter_obol(o):
-    """
-    Roundup a value to the nearest quarter obol.
+    """Roundup a value to the nearest quarter obol.
 
-    Parameters
-    o Value to be rounded (instance of Khremata, or any number)
+    :param o: Value to be rounded
+    :type o: Khremata, int, float
+    :rtype: Khremata, float
 
-    If passed an instance of Khremata, the return value will also be an
-    instance of Khremata. Otherwise the return value will be a float.
+    If passed an instance of :py:class:`Khremata`, the return value
+    will also be an instance of :py:class:`Khremata`. Otherwise the
+    return value will be a float.
+
     """
 
     if isinstance(o, Khremata):
