@@ -58,7 +58,28 @@ FMT_TDO = (NUMERALS["Τ"], NUMERALS["𐅂"])
 
 
 class Khremata():
+    """Represents a monetary amount in Greek talents, drakhmas, and obols."""
     def __init__(self, amt, limit=None):
+        """:param amt: Monetary amount
+        :type amt: str, float, int, fraction.Fraction, Khremata
+        :param limit: max denominator for fractions
+        :type limit: int
+
+
+        The amount can be provided as an integer number or fractional
+        number of obols, another Kremata instance, or as a
+        string. Strings can be in the format "1t 813d 1.5b", with
+        upper or lower case "t" indicating talents, "d" drachmas, and
+        "o" or "b" obols or as a Greek acrophonical numeral string
+        such as "Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁".
+
+        Amounts are stored internally as a possibly fractional amount
+        of obols. The ``limit`` parameter can be used to set a maximum
+        value of the denominator for fractional values. See
+        fractions.Fraction.limit_denominator.
+
+        """
+        
         self.b = self._parse_amt(amt, limit)
 
     def _parse_amt(self, amt, limit):
@@ -90,15 +111,32 @@ class Khremata():
             f"Cannot parse {amt} as monetary amount")
 
     def as_abbr(self, decimal=False):
+        """
+        :param decimal: Format as decimal if True, otherwise as a fraction
+        :type decimal: bool
+        :return: Monetary amount as an abbreviation
+        :rtype: str
+        """
         if decimal:
             return format_amount(self.b, Fmt.ABBR | Fmt.DECIMAL)
 
         return format_amount(self.b, Fmt.ABBR)
 
     def as_greek(self):
+        """
+        :return: Monetary amount as Greek acrophonic numerals
+        :rtype: str
+        """
+        
         return format_amount(self.b.limit_denominator(4), Fmt.GREEK)
 
     def as_phrase(self, decimal=False):
+        """
+        :param decimal: Format as decimal if True, otherwise as a fraction
+        :type decimal: bool
+        :return: Monetary amount as an English phrase
+        :rtype: str
+        """
         if decimal:
             return format_amount(self.b, Fmt.ENGLISH | Fmt.DECIMAL)
 
@@ -136,7 +174,7 @@ class Khremata():
 
         return self.b < Khremata(other).b
 
-    def ___le__(self, other):
+    def __le__(self, other):
         if isinstance(other, Khremata):
             return self.b <= other.b
 
@@ -170,6 +208,9 @@ class Khremata():
         return Khremata(self.b - Khremata(other).b)
 
     def __mul__(self, other):
+        """
+        :raise UndefinedMonetaryOperation: if multiplying two :py:class:`akrophonobolos.Khremata` instances
+        """
         if isinstance(other, Khremata):
             raise UndefinedMonetaryOperation("Cannot multiply two instances of"
                                              " Khremata")
@@ -209,15 +250,43 @@ def rec_reduce(amt, denominations):
 
 
 def valid_greek_amount(amt):
+    """Return True if a Greek numeric string.
+
+    :param amt: Monetary string
+    :type amt: str
+    :rtype: bool
+
+    Tests whether ``amt`` can be parsed as a valid Greek acrophonic
+    numeral such as "Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁".
+
+    """
+    
     return GREEK_AMT.search(amt) is not None
 
 
 def valid_amount_str(amt):
+    """Return true if a valid monetary abbreviation
+
+    :param amt: Monetary string
+    :type amt: str
+    :rtype: bool
+
+    Tests whether ``amt`` can be parsed as a valid Greek monetary abbreviation
+    such as "1t 813d 1.5b".
+
+"""
     return AMT.search(amt) is not None
 
 
 def parse_amount(amt):
-    """ Parse an Athenian currency string into a tuple. """
+    """ Parse an Athenian currency string into obols. 
+    
+    :param amt: Monetary string
+    :type amt: str
+    :return: Amount in obols
+    :rtype: fractions.Fraction
+
+    """
     amt_match = AMT.match(amt)
     talents = 0 if amt_match[2] is None else int(amt_match[2])
     drachmas = 0 if amt_match[4] is None else int(amt_match[4])
@@ -242,7 +311,14 @@ def _parse_obols(amt):
     
 
 def parse_greek_amount(amt):
-    """ Parse Unicode Greek acrophonic numeral. """
+    """ Parse Unicode Greek acrophonic numeral into obols. 
+    
+    :param amt: Monetary string
+    :type amt: str
+    :return: Amount in obols
+    :rtype: fractions.Fraction
+
+    """
     return sum([NUMERALS[c] for c in list(amt)])
 
 
@@ -295,17 +371,16 @@ def interest(p, d, r=interest_rate(), roundup=True):
     """
     Calculate interest on principal p for d days at rate r
 
-    Parameters
-    p       Amount of principal. Can be an instance of Khremata or anything
-            that can be used to create an instance of Khremata
-    d       Number of days over which to calculate interest
-    r       Simple interest rate, should be an instance of Fraction (but can
-            be any number. Default value is the default returned by
-            interest_rate()
-    roundup Boolean (default True). If True, result is rounded up to nearest
-            quarter obolós. If False, the exact amount is returned
+    :param i: Amount of interest
+    :type i: str, float, int, fraction.Fraction, Khremata
+    :param d: Number of days over which to calculate interest
+    :type d: int
+    :param r: Simple interest rate
+    :type r: fractions.Fraction, int, float
+    :param roundup: If True, result is rounded up to nearest quarter obolós. If False, the exact amount is returned
+    :type roundup: bool
+    :rtype: Kremata
 
-    Return value will be an instance of Khremata.
     """
 
     if not isinstance(p, Khremata):
@@ -321,14 +396,13 @@ def loan_term(p, i, r=interest_rate(), roundoff=True):
     """
     Calculate loan term in days if principal was p and interest i at rate r
 
-    Parameters
-    p       Amount of principal. Can be an instance of Khremata or anything
-            that can be used to create an instance of Khremata
-    i       Amount of interest. Can be an instance of Khremata or anything
-            that can be used to create an instance of Khremata
-    r       Simple interest rate, should be an instance of Fraction (but can
-            be any number. Default value is the default returned by
-            interest_rate()
+    :param p: Amount of principal
+    :type p: str, float, int, fraction.Fraction, Khremata
+    :param i: Amount of interest
+    :type i: str, float, int, fraction.Fraction, Khremata
+    :param r: Simple interest rate
+    :type r: fractions.Fraction, int, float
+
     """
     if not isinstance(p, Khremata):
         return loan_term(Khremata(p), i, r, roundoff)
@@ -346,17 +420,16 @@ def principal(i, d, r=interest_rate(), roundup=True):
     """
     Calculate the principal if loan returned i interest after d days at rate r
 
-    Parameters
-    i       Amount of interest. Can be an instance of Khremata or anything
-            that can be used to create an instance of Khremata
-    d       Number of days from which to calculate principal
-    r       Simple interest rate, should be an instance of Fraction (but can
-            be any number. Default value is the default returned by
-            interest_rate()
-    roundup Boolean (default True). If True, result is rounded up to nearest
-            quarter obolós. If False, the exact amount is returned
+    :param i: Amount of interest
+    :type i: str, float, int, fraction.Fraction, Khremata
+    :param d: Number of days over which to calculate interest
+    :type d: int
+    :param r: Simple interest rate
+    :type r: fractions.Fraction, int, float
+    :param roundup: If True, result is rounded up to nearest quarter obolós. If False, the exact amount is returned
+    :type roundup: bool
+    :rtype: Kremata
 
-    Return value will be an instance of Khremata.
     """
     if not isinstance(i, Khremata):
         return principal(Khremata(i), d, r, roundup)
