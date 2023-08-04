@@ -1,4 +1,2 @@
-Package                       Version   Location
------------------------------ --------- --------------------------------------
-enum-tools                    0.10.0
-sphinx-toolbox                3.5.0
+enum-tools==0.10.0
+sphinx-toolbox==3.5.0
