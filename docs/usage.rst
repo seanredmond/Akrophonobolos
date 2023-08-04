@@ -12,59 +12,98 @@ Usage
 -----
 
 Greek currency amounts are recorded in *tálanta* ("talents"),
-*drakhmaí* ("drachmas, 6000 to 1 *tálanta*), and *oboloí* ("obols", 6
+*drakhmaí* ("drachmas", 6000 to 1 *tálanta*), and *oboloí* ("obols", 6
 to 1 *drakhmḗ*). These amounts are usually written in acrophonic
 numerals such as 𐅋 (100 *tálanta*), 𐅄 (50 *drakhmaí*), or 𐅀 (¼
 *obolós*). It is very cumbersome to try to do calculations with these
-numbers. :py:class:`akrophonobolos` provides functions for parsing,
-manipulating, and formatting these amounts
+numbers. For example the number Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁 has to be worked out as 1
+talent + 50 drachmas + (100 drachmas × 3) + 10 drachmas + (1 obols
+× 3) + half an obol. Altogether, that's 1 talent, 813 drachmas, 1½
+obols.
 
+It's even more challenging to do math with these
+numbers. :py:mod:`akrophonobolos` provides functions for parsing,
+manipulating, and formatting these amounts.
 
-Akrophonobolos provides a class, :py:class:`Khremata` (χρήματα,
-"money") and function for manipulating instances of this class.
+After importing the package (suggest importing it as `obol`):
 
-Initializing
-^^^^^^^^^^^^
+>>> import akrophonobolos as obol
 
-An instance of :py:class:`Khremata` can be initialized in several
-different ways:
+You can parse a string of Unicode Greek acrophonic numerals:
 
-With a string that gives amounts with the abbreviations "t", "d", and
-"b" or "o":
+>>> obol.parse_greek_amount("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
+Fraction(81759, 2)
+
+:py:mod:`akrophonobolos` also understands a format that uses "t" for
+*tálanta*, "d" for *drakhmaí* and "o" or "b" *oboloí*. I recommend
+using "b" since "o" looks to much like a "0":
+
+>>> obol.parse_amount("1t 813d 1.5b")
+Fraction(81759, 2)
+
+This format is not case-sensitive and spaces don't matter
+
+>>> obol.parse_amount("1T813D1.5B")
+Fraction(81759, 2)
+
+This format can also include Unicode vulgar fractions for ½ and ¼ *oboloí*:
+
+>>> obol.parse_amount("1t 813d 1½b")
+Fraction(81759, 2)
+
+The amount is converted to a number of *oboloí* using the Python
+`fractions <https://docs.python.org/3/library/fractions.html>`_
+library. One *tálanta* is 36,000 *oboloí*, and 813 *drakhmaí* is
+4,878, so our example amount is 36,000 + 4,878 + 1.5 = 40,879.5
+*oboloí*. 81759/2 is the fractional way of saying 40879.5. Using
+fractions avoids problems with floating point math and more closely
+approximates the way these calculations would have been made in
+ancient Greece.
+
+This can be formatted:
+
+>>> cash = obol.parse_amount("1t 813d 1½b")
+>>> obol.format_amount(cash)
+'1t 813d 1½b'
+
+The default formatting is as an abbreviated phrase with fractions. You can output it as a decimal instead:
+
+>>> obol.format_amount(cash, obol.Fmt.DECIMAL)
+'1t 813d 1.5b'
+
+As a full English phrase:
+
+>>> obol.format_amount(cash, obol.Fmt.DECIMAL|obol.Fmt.ENGLISH)
+'1 talent, 813 drachmas, 1.5 obols'
+
+Or back to a Greek numeral:
+
+>>> obol.format_amount(cash, obol.Fmt.GREEK)
+'Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁'
+
+These amounts can be used with any of the functions described below
+but :py:mod:`akrophonobolos` also provides a class,
+:py:class:`Khremata` (from χρήματα, "money") to make it easier to keep
+track of and format the amounts.
+
+:py:class:`Khremata` class
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An instance of :py:class:`Khremata` can be initialized with any of the string formats shown above:
+
 
 >>> import akrophonobolos as obol
 >>> obol.Khremata("1t 813d 1.5b")
 Khremata (1t 813d 1½b [= 40879.5 obols])
 
-You can use upper or lowercase letters, and spaces do not matter:
-
->>> obol.Khremata("1T 813D 1.5B")
+>>> obol.Khremata("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
 Khremata (1t 813d 1½b [= 40879.5 obols])
 
->>> obol.Khremata("1t813d1.5b")
-Khremata (1t 813d 1½b [= 40879.5 obols])
-    
-You can use "o" for obols, but since this is too similar to a zero,
-"b" is better:
-
->>> obol.Khremata("1t 813d 1.5o")
-Khremata (1t 813d 1½b [= 40879.5 obols])
-
->>> obol.Khremata("1T 813D 1.5O")
-Khremata (1t 813d 1½b [= 40879.5 obols])
-	
-Internally, the :py:class:`Khremata` class stores the value as a (possibly
-fractional) number of *oboloí*, and this number can be used directly
-to initialize an instance:
+Or you can pass an :py:obj:`int`, :py:obj:`float`, or :py:obj:`Fraction`:
 
 >>> obol.Khremata(40879.5)
 Khremata (1t 813d 1½b [= 40879.5 obols])
-	
-Finally you can use a string of `Unicode Greek acrophonic
-numerals <https://en.wikipedia.org/wiki/Ancient_Greek_Numbers_(Unicode_block)>`_:
 
->>> obol.Khremata("Τ𐅅ΗΗΗΔ𐅂𐅂𐅂Ι𐅁")
-Khremata (1t 813d 1½b [= 40879.5 obols])
     
 Formatting
 ^^^^^^^^^^
@@ -163,10 +202,7 @@ But monetary sums could be recorded down to the quarter-obol:
 >>> m.b
 Fraction(144029, 4) 
     
-which is the :py:class:`Fraction` form of 36,007.25 *oboloí*. Storing
-the value as a :py:class:`Fraction` avoids some issues with floating
-point math and better approximates how Ancient Greeks did math, since
-they did not use decimal numbers.
+which is the :py:class:`Fraction` form of 36,007.25 *oboloí*.
 
 
 Loans and Interest
@@ -180,7 +216,7 @@ from the money held in the Parthenon and temples of other gods to the
 Athenian state. Loans were made at simple interest, most commonly at
 the rate of 1 *drakhmḗ* per 5 *tálanta* per day.
 
-Akrophonobolos provides functions for working with loans like this. To
+:py:mod:`akrophonobolos` provides functions for working with loans like this. To
 start, you can calculate a more useful version of the rate. Given an
 amount of principal, a number of days, and an amount of interest to be
 returned, you get back the amount of simple interest to be added for
@@ -200,7 +236,7 @@ interest:
 >>> obol.Khremata("25t") * rate * 365
 Khremata (1825d [= 10950.0 obols])
     
-Of course Akrophonobolos has a function for this:
+Of course :py:mod:`Akrophonobolos` has a function for this:
 
 >>> rate = obol.interest_rate("5t", 1, "1d")
 >>> obol.interest(obol.Khremata("25t"), 365, rate)
@@ -259,17 +295,16 @@ Now, if we want to double-check this:
 >>> obol.interest("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι", 17)
 Khremata (1d 5¾b [= 11.75 obols])
     
-We get an answer that is ¼ _obolós_ too high (11.75 instead of
-11.5). We do not know how the ancient Greeks did this math, how they
-rounded, or what kind of approximations they used. The smallest unit
-they recorded was ¼ _obolós_, so in Akrohobolos the :py:func:`interest` and
-:py:func:`principal` functions round up to this by default. You can get an
-unrounded answer:
+We get an answer that is ¼-*obolós* too high (11.75 instead of
+11.5). The :py:func:`interest` and :py:func:`principal` functions
+round up to the nearest ¼-*obolós* by default. Sometimes this matches
+the historical record sometimes is does not. You can get an unrounded
+answer:
 
 >>> obol.interest("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι", 17, roundup=False)
 Khremata (1d 5b [= 11.621766666666666 obols])
     
-We can see what the precise fraction is:
+Or we can see what the precise fraction is:
     
 >>> precise = obol.interest("ΧΧΧΗΗΗΗΔ𐅃𐅂𐅂𐅂Ι", 17, roundup=False)
 >>> precise.b
@@ -277,7 +312,7 @@ Fraction(1635618250918339, 140737488355328)
     
 1,635,618,250,918,339/140,737,488,355,328ths is a quite a
 fraction. Clearly the Greeks did some approximating. Maybe you can
-play around with Akrophonobolos and figure out how they arrived at
+play around with :py:mod:`skrophonobolos` and figure out how they arrived at
 11.5 obols for this amount.
 
 :py:func:`loan_term()` rounds to the nearest integer, but you can
