@@ -30,7 +30,8 @@ author = 'Sean Redmond'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest'
+    'sphinx.ext.doctest',
+    'enum_tools.autoenum'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

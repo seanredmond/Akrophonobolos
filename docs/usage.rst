@@ -11,7 +11,6 @@ Installation
 Usage
 -----
 
-.. py:module:: akrophonobolos
 
 Akrophonobolos provides a class, :py:class:`Khremata` (χρήματα,
 "money") and function for manipulating instances of this class.

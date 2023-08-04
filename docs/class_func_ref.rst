@@ -1,8 +1,14 @@
 Class and Function Reference
 ============================
 
-``Kremata`` Class
------------------
+.. automodule:: akrophonobolos
+
+.. autoflag:: akrophonobolos.Fmt
+    :members:
+
+
+``Khremata`` Class
+------------------
 
 This class represents a Greek monetary amount and provides for
 formatting and mathematical operations.
@@ -38,9 +44,12 @@ Functions
 .. autofunction:: akrophonobolos.valid_greek_amount
 .. autofunction:: akrophonobolos.valid_amount_str
 .. autofunction:: akrophonobolos.parse_amount
+.. autofunction:: akrophonobolos.format_amount
 .. autofunction:: akrophonobolos.loan_term
+.. autofunction:: akrophonobolos.interest_rate
 .. autofunction:: akrophonobolos.interest
 .. autofunction:: akrophonobolos.principal
+.. autofunction:: akrophonobolos.roundup_to_quarter_obol
 		  
 
 
