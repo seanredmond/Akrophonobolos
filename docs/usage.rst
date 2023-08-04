@@ -11,6 +11,14 @@ Installation
 Usage
 -----
 
+Greek currency amounts are recorded in *tálanta* ("talents"),
+*drakhmaí* ("drachmas, 6000 to 1 *tálanta*), and *oboloí* ("obols", 6
+to 1 *drakhmḗ*). These amounts are usually written in acrophonic
+numerals such as 𐅋 (100 *tálanta*), 𐅄 (50 *drakhmaí*), or 𐅀 (¼
+*obolós*). It is very cumbersome to try to do calculations with these
+numbers. :py:class:`akrophonobolos` provides functions for parsing,
+manipulating, and formatting these amounts
+
 
 Akrophonobolos provides a class, :py:class:`Khremata` (χρήματα,
 "money") and function for manipulating instances of this class.
