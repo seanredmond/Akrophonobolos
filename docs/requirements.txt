@@ -1,2 +1,3 @@
+-e git+git@github.com:seanredmond/Akrophonobolos.git@417809c9fb6110bf1b18e2711dfc429f851e36c9#egg=akrophonobolos
 enum-tools==0.10.0
 sphinx-toolbox==3.5.0
