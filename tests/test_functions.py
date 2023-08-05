@@ -3,7 +3,7 @@ from fractions import Fraction
 
 
 def test_version():
-    assert obol.version() == "0.0.2"
+    assert obol.version() == "1.0.0"
 
 
 def test_parse_amt():
